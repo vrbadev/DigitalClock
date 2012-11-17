@@ -4,6 +4,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.entity.Player;
 
 public class Clock {
 	private String clockName;
@@ -12,6 +13,7 @@ public class Clock {
 	private Block playersBlock;
 	private BlockFace direction;
 	private Material material;
+	private Material fillingMaterial = Material.AIR;
 	private Location location;
 	private boolean retrieveData = true;
 	
@@ -20,25 +22,10 @@ public class Clock {
 		this.clockCreator = playerName;
 		this.startBlock = block;
 		this.playersBlock = playersBlock;
-		
-		if(block.getFace(playersBlock) != null) {
-     		this.direction = block.getFace(playersBlock);
-		} else {
-			int px = playersBlock.getX();
-			int pz = playersBlock.getZ();
-			if(px < block.getX() && pz == block.getZ()) {
-				this.direction = BlockFace.NORTH;
-			} else if(px > block.getX() && pz == block.getZ()) {
-				this.direction = BlockFace.SOUTH;
-			} else if(pz < block.getZ() && px == block.getX()) {
-				this.direction = BlockFace.EAST;
-			} else /*if(pz > block.getZ() && px == block.getX())*/ {
-				this.direction = BlockFace.WEST;
-			}
-		}
-		
+		this.retrieveData = true;
 		this.material = block.getType();
 		this.location = block.getLocation();
+		this.resetBlockFace();
 	}
 	
 	public void generate() {
@@ -48,6 +35,25 @@ public class Clock {
 		} else {
 			throw new NullPointerException();
 		}
+	}
+	
+	public void resetBlockFace() {
+		if(this.startBlock.getFace(this.playersBlock) != null) {
+     		this.direction = this.startBlock.getFace(this.playersBlock);
+		} else {
+			int px = this.playersBlock.getX();
+			int pz = this.playersBlock.getZ();
+			if(px < this.startBlock.getX() && pz == this.startBlock.getZ()) {
+				this.direction = BlockFace.NORTH;
+			} else if(px > this.startBlock.getX() && pz == this.startBlock.getZ()) {
+				this.direction = BlockFace.SOUTH;
+			} else if(pz < this.startBlock.getZ() && px == this.startBlock.getX()) {
+				this.direction = BlockFace.EAST;
+			} else /*if(pz > block.getZ() && px == block.getX())*/ {
+				this.direction = BlockFace.WEST;
+			}
+		}
+		
 	}
 	
 	public void write() {
@@ -62,10 +68,34 @@ public class Clock {
 			Events.plugin.getConfig().set(this.clockName + ".z2", this.playersBlock.getZ());
 			Events.plugin.getConfig().set(this.clockName + ".direction", this.direction.name());
 			Events.plugin.getConfig().set(this.clockName + ".material", this.material.name());
+			Events.plugin.getConfig().set(this.clockName + ".filling", this.fillingMaterial.name());
 			Events.plugin.saveConfig();
 		} else {
 			throw new NullPointerException();
 		}
+	}
+	
+	public void teleportToClock(Player player) {
+		player.teleport(this.playersBlock.getLocation());
+	}
+	
+	public void move(Block block, Block playersblock) {
+		Generator.removeClock(this);
+		this.startBlock = block;
+		this.playersBlock = playersblock;
+		this.resetBlockFace();
+		this.generate();
+	}
+	
+	public Material getFillingMaterial() {
+		this.reloadFromConfig();
+		return this.fillingMaterial;
+	}
+	
+	public Material setFillingMaterial(int id) {
+		this.fillingMaterial = Material.getMaterial(id);
+		this.write();
+		return this.fillingMaterial;
 	}
 	
 	public static void remove(Clock clock) {
@@ -90,21 +120,20 @@ public class Clock {
         	this.clockCreator = Events.plugin.getConfig().getString(this.clockName + ".creator");
         	this.direction = BlockFace.valueOf(Events.plugin.getConfig().getString(this.clockName + ".direction"));
         	this.material = Material.valueOf(Events.plugin.getConfig().getString(this.clockName + ".material"));
-    	}
+        	this.fillingMaterial = Material.valueOf(Events.plugin.getConfig().getString(this.clockName + ".filling"));
+        }
     }
     
     public BlockFace rotate(String direction) {
 		Generator.removeClock(this);
 		this.direction = BlockFace.valueOf(direction.toUpperCase());
-    	this.write();
-		Generator.start(this);
+    	this.generate();
 		return this.direction;
     }
     
     public Material changeMaterial(int id) {
     	this.material = Material.getMaterial(id);
-    	this.write();
-		Generator.start(this);
+    	this.generate();
 		return this.material;
     }
     
