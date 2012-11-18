@@ -31,7 +31,7 @@ public class Commands implements CommandExecutor {
 						count = this.plugin.usersClock.get(player.getName());
 					}
 					boolean limitReached = false;
-					if(player.hasPermission("digitalclock.limit." + count)) {
+					if(player.hasPermission("digitalclock.limit." + count) && count != 0) {
 						limitReached = true;
 					}
 					if(limitReached == false) {
