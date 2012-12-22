@@ -18,6 +18,7 @@ public class Main extends JavaPlugin {
     protected Map<String, Integer> usersClock = new HashMap<String, Integer>();
 	protected ArrayList<String> clocks = new ArrayList<String>();
 	protected Logger console = Logger.getLogger("Minecraft");
+	protected int taskId = 0;
 	private FileConfiguration settings = null;
 	private File settingsFile = null;
 	
@@ -30,9 +31,17 @@ public class Main extends JavaPlugin {
 		this.saveDefaultSettings();
 		this.reloadSettings();
 		this.getClocks();
-		this.console.info("[DigitalClock] Loaded "+ this.clocks.size() +" clocks.");
-		
-		this.getServer().getScheduler().scheduleAsyncRepeatingTask(this, new Runnable() {
+		this.runTask();
+		this.console.info("[DigitalClock] Loaded "+ this.clocks.size() +" clocks. Clocks are running under task number "+ this.taskId +".");
+	}
+	
+	public void onDisable() {
+		this.getServer().getScheduler().cancelTasks(this);
+		this.console.info("[DigitalClock] Plugin has been disabled!");
+	}
+
+	protected void runTask() {
+		this.taskId = this.getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
 			public void run() {
 				for(String name : clocks) {
 					Clock clock = Clock.loadClockByClockName(name);
@@ -42,10 +51,6 @@ public class Main extends JavaPlugin {
 				}
 			}
 		}, 0L, 20L);
-	}
-	
-	public void onDisable() {
-		this.console.info("[DigitalClock] Plugin has been disabled!");
 	}
 	
 	public void reloadSettings() {

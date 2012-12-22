@@ -1,0 +1,35 @@
+name: DigitalClock
+main: me.PerwinCZ.DigitalClock.Main
+author: PerwinCZ
+version: 1.2
+commands:
+  digitalclock:
+    description: Use more arguments for this command
+    usage: /digitalclock (arguments)
+permissions:
+  digitalclock.create:
+    description: Allows you to create a new clock 
+  digitalclock.remove:
+    description: Allows you to remove an existing clock 
+  digitalclock.rotate:
+    description: Allows you to rotate an existing clock 
+  digitalclock.material:
+    description: Allows you to change the material of an existing clock 
+  digitalclock.fill:
+    description: Allows you to change the filling material of an existing clock 
+  digitalclock.move:
+    description: Allows you to move an existing clock to the clicked coords
+  digitalclock.tp:
+    description: Allows you to teleport self to an existing clock's location  
+  digitalclock.stopclocks:
+    description: Allows you to stop all clocks on the server     
+  digitalclock.runclocks:
+    description: Allows you to run all stopped clocks on the server  
+  digitalclock.list:
+    description: Allows you to show the list of existing clocks   
+  digitalclock.reload:
+    description: Allows you to reload settings.yml file   
+  digitalclock.help:
+    description: Allows you to show the plugin command helper
+  digitalclock.limit.*:
+    description: Sets the limit of clock for player            
