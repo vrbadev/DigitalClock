@@ -1,7 +1,7 @@
 name: DigitalClock
 main: me.PerwinCZ.DigitalClock.Main
 author: PerwinCZ
-version: 1.2
+version: 1.3
 commands:
   digitalclock:
     description: Use more arguments for this command
@@ -32,4 +32,15 @@ permissions:
   digitalclock.help:
     description: Allows you to show the plugin command helper
   digitalclock.limit.*:
-    description: Sets the limit of clock for player            
+    description: Sets the limit of clock for player 
+  digitalclock.addingminutes:
+    description: Allows you to add minutes on your clock  
+  digitalclock.toggleampm:
+    description: Allows you to toggle showing AM/PM 
+  digitalclock.toggleseconds:
+    description: Allows you to toggle showing seconds 
+  digitalclock.toggleblinking:
+    description: Allows you to toggle blinking of colon (:)
+    
+    
+                 

@@ -16,6 +16,13 @@ public class Clock {
 	private Material fillingMaterial = Material.AIR;
 	private Location location;
 	private boolean retrieveData = true;
+	private byte data = (byte) 0;
+	private byte fillingData = (byte) 0;
+	private int addMinutes = 0;
+	private boolean showSeconds;
+	private boolean blinking;
+	private boolean blinkingChanger;
+	private boolean ampm;
 	
 	public Clock(String name, String playerName, Block block, Block playersBlock) {
 		this.clockName = name;
@@ -24,6 +31,7 @@ public class Clock {
 		this.playersBlock = playersBlock;
 		this.retrieveData = true;
 		this.material = block.getType();
+		this.data = block.getData();
 		this.location = block.getLocation();
 		this.resetBlockFace();
 	}
@@ -68,7 +76,14 @@ public class Clock {
 			Events.plugin.getConfig().set(this.clockName + ".z2", this.playersBlock.getZ());
 			Events.plugin.getConfig().set(this.clockName + ".direction", this.direction.name());
 			Events.plugin.getConfig().set(this.clockName + ".material", this.material.name());
+			Events.plugin.getConfig().set(this.clockName + ".data", this.data);
 			Events.plugin.getConfig().set(this.clockName + ".filling", this.fillingMaterial.name());
+			Events.plugin.getConfig().set(this.clockName + ".fdata", this.fillingData);
+			Events.plugin.getConfig().set(this.clockName + ".add", this.addMinutes);
+			Events.plugin.getConfig().set(this.clockName + ".seconds", this.showSeconds);
+			Events.plugin.getConfig().set(this.clockName + ".blinking", this.blinking);
+			Events.plugin.getConfig().set(this.clockName + ".changer", this.blinkingChanger);
+			Events.plugin.getConfig().set(this.clockName + ".ampm", this.ampm);
 			Events.plugin.saveConfig();
 		} else {
 			throw new NullPointerException();
@@ -91,13 +106,19 @@ public class Clock {
 		this.reloadFromConfig();
 		return this.fillingMaterial;
 	}
+
+	public byte getFillingData() {
+		this.reloadFromConfig();
+		return this.fillingData;
+	}
 	
-	public Material setFillingMaterial(int id) {
+	public Material setFillingMaterial(int id, int md) {
 		this.fillingMaterial = Material.getMaterial(id);
+		this.fillingData = (byte) md;
 		this.write();
 		return this.fillingMaterial;
 	}
-	
+
 	public static void remove(Clock clock) {
 		Generator.removeClock(clock);
 		clock.setRetrieveData(false);
@@ -120,7 +141,14 @@ public class Clock {
         	this.clockCreator = Events.plugin.getConfig().getString(this.clockName + ".creator");
         	this.direction = BlockFace.valueOf(Events.plugin.getConfig().getString(this.clockName + ".direction"));
         	this.material = Material.valueOf(Events.plugin.getConfig().getString(this.clockName + ".material"));
+        	this.data = (byte) Events.plugin.getConfig().getInt(this.clockName + ".data");
         	this.fillingMaterial = Material.valueOf(Events.plugin.getConfig().getString(this.clockName + ".filling"));
+        	this.fillingData = (byte) Events.plugin.getConfig().getInt(this.clockName + ".fdata");
+        	this.addMinutes = Integer.parseInt(Events.plugin.getConfig().getString(this.clockName + ".add"));
+        	this.showSeconds = Boolean.parseBoolean(Events.plugin.getConfig().getString(this.clockName + ".seconds"));
+        	this.blinking = Boolean.parseBoolean(Events.plugin.getConfig().getString(this.clockName + ".blinking"));
+        	this.blinkingChanger = Boolean.parseBoolean(Events.plugin.getConfig().getString(this.clockName + ".changer"));
+        	this.ampm = Boolean.parseBoolean(Events.plugin.getConfig().getString(this.clockName + ".ampm"));
         }
     }
     
@@ -131,8 +159,9 @@ public class Clock {
 		return this.direction;
     }
     
-    public Material changeMaterial(int id) {
+    public Material changeMaterial(int id, int md) {
     	this.material = Material.getMaterial(id);
+    	this.data = (byte) md;
     	this.generate();
 		return this.material;
     }
@@ -147,6 +176,54 @@ public class Clock {
 	
 	public void setCreator(String creator) {
 		this.clockCreator = creator;
+		this.write();
+	}
+	
+	public void setShowingSeconds(boolean ss) {
+		Generator.removeClock(this);
+		this.showSeconds = ss;
+		this.write();
+	}
+	
+	public void setBlinking(boolean bl) {
+		this.blinking = bl;
+		this.write();
+	}
+	
+	public boolean isBlinking() {
+		this.reloadFromConfig();
+		return this.blinking;
+	}
+	
+	public void setAMPM(boolean ap) {
+		Generator.removeClock(this);
+		this.ampm = ap;
+		this.write();
+	}
+	
+	public boolean getAMPM() {
+		this.reloadFromConfig();
+		return this.ampm;
+	}
+	
+	public void setBlinkingChanger(boolean blm) {
+		this.blinkingChanger = blm;
+		this.write();
+	}
+	
+	public boolean isBlinkingChangerON() {
+		this.reloadFromConfig();
+		return this.blinkingChanger;
+	}
+	
+	public boolean shouldShowSeconds() {
+		this.reloadFromConfig();
+		return this.showSeconds;
+	}
+
+	public void addMinutes(int m) {
+		this.reloadFromConfig();
+		this.addMinutes = m;
 		this.write();
 	}
 	
@@ -182,6 +259,17 @@ public class Clock {
 			return this.material;
 		}
 		return null;
+	}
+
+	public byte getData() {
+		this.reloadFromConfig();
+		return this.data;
+	}
+	
+
+	public int getAddMinutes() {
+		this.reloadFromConfig();
+		return this.addMinutes;
 	}
 	
 	public Block getStartBlock() {

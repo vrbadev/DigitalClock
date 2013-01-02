@@ -21,6 +21,7 @@ public class Main extends JavaPlugin {
 	protected int taskId = 0;
 	private FileConfiguration settings = null;
 	private File settingsFile = null;
+	protected boolean WorldEdit = false;
 	
 	public void onEnable() {
 		this.console.info("[DigitalClock] Plugin has been enabled!");
@@ -32,7 +33,7 @@ public class Main extends JavaPlugin {
 		this.reloadSettings();
 		this.getClocks();
 		this.runTask();
-		this.console.info("[DigitalClock] Loaded "+ this.clocks.size() +" clocks. Clocks are running under task number "+ this.taskId +".");
+		this.console.info("[DigitalClock] Loaded "+ this.clocks.size() +" clock(s). Clocks are running under task number "+ this.taskId +".");
 	}
 	
 	public void onDisable() {
