@@ -23,6 +23,8 @@ public class Clock {
 	private boolean blinking;
 	private boolean blinkingChanger;
 	private boolean ampm;
+	private boolean countdown;
+	private int countdownto;
 	
 	public Clock(String name, String playerName, Block block, Block playersBlock) {
 		this.clockName = name;
@@ -84,6 +86,8 @@ public class Clock {
 			Events.plugin.getConfig().set(this.clockName + ".blinking", this.blinking);
 			Events.plugin.getConfig().set(this.clockName + ".changer", this.blinkingChanger);
 			Events.plugin.getConfig().set(this.clockName + ".ampm", this.ampm);
+			Events.plugin.getConfig().set(this.clockName + ".countdown", this.countdown);
+			Events.plugin.getConfig().set(this.clockName + ".cdt", this.countdownto);
 			Events.plugin.saveConfig();
 		} else {
 			throw new NullPointerException();
@@ -106,7 +110,7 @@ public class Clock {
 		this.reloadFromConfig();
 		return this.fillingMaterial;
 	}
-
+	
 	public byte getFillingData() {
 		this.reloadFromConfig();
 		return this.fillingData;
@@ -120,6 +124,10 @@ public class Clock {
 	}
 
 	public static void remove(Clock clock) {
+		if(Events.plugin.clockTasks.containsKey(clock.getName())) {
+			Events.plugin.getServer().getScheduler().cancelTask(Events.plugin.clockTasks.get(clock.getName()));
+			Events.plugin.clockTasks.remove(clock.getName());
+		}
 		Generator.removeClock(clock);
 		clock.setRetrieveData(false);
 		Events.plugin.getConfig().set(clock.getName(), null);
@@ -149,6 +157,8 @@ public class Clock {
         	this.blinking = Boolean.parseBoolean(Events.plugin.getConfig().getString(this.clockName + ".blinking"));
         	this.blinkingChanger = Boolean.parseBoolean(Events.plugin.getConfig().getString(this.clockName + ".changer"));
         	this.ampm = Boolean.parseBoolean(Events.plugin.getConfig().getString(this.clockName + ".ampm"));
+        	this.countdown = Boolean.parseBoolean(Events.plugin.getConfig().getString(this.clockName + ".countdown"));
+        	this.countdownto = Events.plugin.getConfig().getInt(this.clockName + ".cdt");
         }
     }
     
@@ -174,6 +184,28 @@ public class Clock {
 		return null;
 	}
 	
+	public boolean isCountdownEnabled() {
+		this.reloadFromConfig();
+		return this.countdown;
+	}
+	
+	public void enableCountdown(boolean c) {
+		this.reloadFromConfig();
+		this.countdown = c;
+		this.write();
+	}
+	
+	public int getCountdownTime() {
+		this.reloadFromConfig();
+		return this.countdownto;
+	}
+	
+	public void setCountdownTime(int t) {
+		this.reloadFromConfig();
+		this.countdownto = t;
+		this.write();
+	}
+	
 	public void setCreator(String creator) {
 		this.clockCreator = creator;
 		this.write();
@@ -183,6 +215,7 @@ public class Clock {
 		Generator.removeClock(this);
 		this.showSeconds = ss;
 		this.write();
+		Events.plugin.runClock(this.getName());
 	}
 	
 	public void setBlinking(boolean bl) {

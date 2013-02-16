@@ -43,4 +43,10 @@ public class Events implements Listener {
 			plugin.enableMoveUsers.remove(player);
     	}
 	}
+	
+	@EventHandler
+	public void onCountdownEnd(CountdownEndEvent evt) {
+		Events.plugin.console.info("[DigitalClock] Countdown of clock '" + evt.getClock().getName() + "' has reached zero time! Clock has been stopped.");
+		Generator.generatingSequence(evt.getClock(), "00", "00", "00"); // <- not working, why?
+	}
 }

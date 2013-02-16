@@ -18,10 +18,9 @@ public class Main extends JavaPlugin {
     protected Map<String, Integer> usersClock = new HashMap<String, Integer>();
 	protected ArrayList<String> clocks = new ArrayList<String>();
 	protected Logger console = Logger.getLogger("Minecraft");
-	protected int taskId = 0;
+	protected Map<String, Integer> clockTasks = new HashMap<String, Integer>();
 	private FileConfiguration settings = null;
 	private File settingsFile = null;
-	protected boolean WorldEdit = false;
 	
 	public void onEnable() {
 		this.console.info("[DigitalClock] Plugin has been enabled!");
@@ -32,8 +31,8 @@ public class Main extends JavaPlugin {
 		this.saveDefaultSettings();
 		this.reloadSettings();
 		this.getClocks();
-		this.runTask();
-		this.console.info("[DigitalClock] Loaded "+ this.clocks.size() +" clock(s). Clocks are running under task number "+ this.taskId +".");
+		this.runTasks();
+		this.console.info("[DigitalClock] Loaded "+ this.clocks.size() +" clock(s).");
 	}
 	
 	public void onDisable() {
@@ -41,17 +40,32 @@ public class Main extends JavaPlugin {
 		this.console.info("[DigitalClock] Plugin has been disabled!");
 	}
 
-	protected void runTask() {
-		this.taskId = this.getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
-			public void run() {
-				for(String name : clocks) {
-					Clock clock = Clock.loadClockByClockName(name);
-					if(Events.plugin.getConfig().getKeys(false).contains(clock.getName())) {
-				    	Generator.start(clock);
-					}
+	private void runTasks() {
+		for(final String name : clocks) {
+			int task = this.getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
+				public void run() {
+						Clock clock = Clock.loadClockByClockName(name);
+						if(Events.plugin.getConfig().getKeys(false).contains(clock.getName())) {
+					    	Generator.start(clock);
+						}
 				}
-			}
-		}, 0L, 20L);
+			}, 0L, 20L);
+			this.clockTasks.put(name, task);
+		}
+	}
+	
+	protected void runClock(final String name) {
+		if(!this.clockTasks.containsKey(name)) {
+			int task = this.getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
+				public void run() {
+						Clock clock = Clock.loadClockByClockName(name);
+						if(Events.plugin.getConfig().getKeys(false).contains(clock.getName())) {
+					    	Generator.start(clock);
+						}
+				}
+			}, 0L, 20L);
+			this.clockTasks.put(name, task);
+		}	
 	}
 	
 	public void reloadSettings() {
