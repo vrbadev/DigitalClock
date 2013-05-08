@@ -21,6 +21,8 @@ public class Generator {
 		int mins = clock.getAddMinutes();
 		boolean cd = clock.isCountdownEnabled();
 		int cdt = clock.getCountdownTime();
+		World w = clock.getStartBlockLocation().getWorld();
+		boolean igt = clock.isIngameTimeEnabled();
 
 		Generator.createBackup(clock);
 		
@@ -28,20 +30,46 @@ public class Generator {
 		String minutes = Generator.getRealNumbers(mins)[1];
 		String seconds = Generator.getRealNumbers(mins)[2];
 
-		if(cd && cdt != 0 && cdt < 360000) {
+		if(cd && !igt && cdt != 0 && cdt < 360000) {
 			hours = Generator.getCountdownNumbers(cdt)[0];
 			minutes = Generator.getCountdownNumbers(cdt)[1];
 			seconds = Generator.getCountdownNumbers(cdt)[2];
 			clock.setCountdownTime(cdt-1);
-		} else if(cd && cdt == 0) {
-			Events.plugin.getServer().getScheduler().cancelTask(Events.plugin.clockTasks.get(clock.getName()));
-			Events.plugin.clockTasks.remove(clock.getName());
+		} else if(cd && !igt && cdt == 0) {
+			Main.INSTANCE.getServer().getScheduler().cancelTask(Main.INSTANCE.clockTasks.get(clock.getName()));
+			Main.INSTANCE.clockTasks.remove(clock.getName());
 			clock.enableCountdown(false);
 			CountdownEndEvent event = new CountdownEndEvent(clock);
-			Events.plugin.getServer().getPluginManager().callEvent(event);
+			Main.INSTANCE.getServer().getPluginManager().callEvent(event);
+		} else if(igt && !cd) {
+			hours = Generator.getIngameNumbers(w)[0];
+			minutes = Generator.getIngameNumbers(w)[1];
+			seconds = Generator.getIngameNumbers(w)[2];
+			Main.INSTANCE.console.severe(hours + ":" + minutes + ":" + seconds);
 		}
 		
 		Generator.generatingSequence(clock, hours, minutes, seconds);
+	}
+	
+	protected static String[] getIngameNumbers(World w) {
+		long time = w.getTime();
+		if(time < 18000) {
+			time += 6000;
+		} else {
+			time -= 18000;
+		}
+		long m = ((time % 1000) * 60 / 1000);
+		String minutes = m + "";
+		if(m < 10) {
+			minutes = "0" + minutes;
+		}
+		String hours = time/1000 + "";
+		if(Integer.parseInt(hours) < 10) {
+			hours = "0" + hours;
+		}
+		String seconds = "00";
+    	String[] result = {hours, minutes, seconds};
+    	return result;
 	}
 	
 	protected static String[] getCountdownNumbers(int cdt) {
@@ -95,8 +123,12 @@ public class Generator {
     	int newHours = 0;
     	if(ampm) {
     		newHours = Integer.parseInt(hours);
-    		if(newHours > 12) {
-    			newHours -= 12;
+    		if(newHours > 12 || newHours == 0) {
+    			if(newHours != 0) {
+        			newHours -= 12;
+    			} else {
+    				newHours = 12;
+    			}
     			hours = Integer.toString(newHours);
     			if(newHours < 10) {
     				hours = "0" + hours;
@@ -108,62 +140,62 @@ public class Generator {
     	}
     	
 		Generator.generate(0, Character.digit(hours.charAt(0), 10), l, b, m, d, f, fd);
-		Generator.generate(Events.plugin.getSettings().getInt("width") + 1, hours.charAt(1) - '0', l, b, m, d, f, fd);
+		Generator.generate(Main.SETTINGS_WIDTH + 1, hours.charAt(1) - '0', l, b, m, d, f, fd);
 		
 		if(bl) { 
 			if(blm) {
-				Generator.generate(Events.plugin.getSettings().getInt("width")*2 + 1, 10, l, b, f, d, f, fd);
+				Generator.generate(Main.SETTINGS_WIDTH*2 + 1, 10, l, b, f, d, f, fd);
 				clock.setBlinkingChanger(false);
 			} else {
-				Generator.generate(Events.plugin.getSettings().getInt("width")*2 + 1, 10, l, b, m, d, f, fd); 
+				Generator.generate(Main.SETTINGS_WIDTH*2 + 1, 10, l, b, m, d, f, fd); 
 				clock.setBlinkingChanger(true);
 			}
 		} else {
-			Generator.generate(Events.plugin.getSettings().getInt("width")*2 + 1, 10, l, b, m, d, f, fd);
+			Generator.generate(Main.SETTINGS_WIDTH*2 + 1, 10, l, b, m, d, f, fd);
 		}
 		
-		Generator.generate(Events.plugin.getSettings().getInt("width")*3 + 1, minutes.charAt(0) - '0', l, b, m, d, f, fd);
-		Generator.generate(Events.plugin.getSettings().getInt("width")*4 + 2, minutes.charAt(1) - '0', l, b, m, d, f, fd);
+		Generator.generate(Main.SETTINGS_WIDTH*3 + 1, minutes.charAt(0) - '0', l, b, m, d, f, fd);
+		Generator.generate(Main.SETTINGS_WIDTH*4 + 2, minutes.charAt(1) - '0', l, b, m, d, f, fd);
 		
 		if(ss) {
 			if(bl) { 
 				if(blm) {
-			     	Generator.generate(Events.plugin.getSettings().getInt("width")*5 + 2, 10, l, b, f, d, f, fd);
+			     	Generator.generate(Main.SETTINGS_WIDTH*5 + 2, 10, l, b, f, d, f, fd);
 					clock.setBlinkingChanger(false);
 				} else {
-			     	Generator.generate(Events.plugin.getSettings().getInt("width")*5 + 2, 10, l, b, m, d, f, fd); 
+			     	Generator.generate(Main.SETTINGS_WIDTH*5 + 2, 10, l, b, m, d, f, fd); 
 					clock.setBlinkingChanger(true);
 				}
 			} else {
-		     	Generator.generate(Events.plugin.getSettings().getInt("width")*5 + 2, 10, l, b, m, d, f, fd);
+		     	Generator.generate(Main.SETTINGS_WIDTH*5 + 2, 10, l, b, m, d, f, fd);
 			}
 			
-	    	Generator.generate(Events.plugin.getSettings().getInt("width")*6 + 2, seconds.charAt(0) - '0', l, b, m, d, f, fd);
-	    	Generator.generate(Events.plugin.getSettings().getInt("width")*7 + 3, seconds.charAt(1) - '0', l, b, m, d, f, fd);
+	    	Generator.generate(Main.SETTINGS_WIDTH*6 + 2, seconds.charAt(0) - '0', l, b, m, d, f, fd);
+	    	Generator.generate(Main.SETTINGS_WIDTH*7 + 3, seconds.charAt(1) - '0', l, b, m, d, f, fd);
 	    	
 	    	if(ampm && letter != null) {
 	    		if(letter == "A") {
-	    	    	Generator.generate(Events.plugin.getSettings().getInt("width")*8 + 4, 11, l, b, m, d, f, fd);
+	    	    	Generator.generate(Main.SETTINGS_WIDTH*8 + 4, 11, l, b, m, d, f, fd);
 	    		} else {
-	    	    	Generator.generate(Events.plugin.getSettings().getInt("width")*8 + 4, 12, l, b, m, d, f, fd);
+	    	    	Generator.generate(Main.SETTINGS_WIDTH*8 + 4, 12, l, b, m, d, f, fd);
 	    		}
-    	    	Generator.generate(Events.plugin.getSettings().getInt("width")*9 + 5, 13, l, b, m, d, f, fd);
+    	    	Generator.generate(Main.SETTINGS_WIDTH*9 + 5, 13, l, b, m, d, f, fd);
 	    	}
 		} else {
 	    	if(ampm && letter != null) {
 	    		if(letter == "A") {
-	    	    	Generator.generate(Events.plugin.getSettings().getInt("width")*5 + 3, 11, l, b, m, d, f, fd);
+	    	    	Generator.generate(Main.SETTINGS_WIDTH*5 + 3, 11, l, b, m, d, f, fd);
 	    		} else {
-	    	    	Generator.generate(Events.plugin.getSettings().getInt("width")*5 + 3, 12, l, b, m, d, f, fd);
+	    	    	Generator.generate(Main.SETTINGS_WIDTH*5 + 3, 12, l, b, m, d, f, fd);
 	    		}
-		    	Generator.generate(Events.plugin.getSettings().getInt("width")*6 + 4, 13, l, b, m, d, f, fd);
+		    	Generator.generate(Main.SETTINGS_WIDTH*6 + 4, 13, l, b, m, d, f, fd);
 	    	}
 		}
 	}
 	
 	private static void generate(int i, int n, Location l, BlockFace b, Material m, byte d, Material f, byte fd) {
 		World w = l.getWorld();
-		for(int q = 0; q < Events.plugin.getSettings().getInt("width"); q++) {
+		for(int q = 0; q < Main.SETTINGS_WIDTH; q++) {
 			int x = l.getBlockX();
 			int z = l.getBlockZ();
 			if(b == BlockFace.NORTH) {
@@ -175,10 +207,10 @@ public class Generator {
 			} else {
 				x = x + q + i;
 			}
-			for(int p = 0; p < Events.plugin.getSettings().getInt("height"); p++) {
+			for(int p = 0; p < Main.INSTANCE.getSettings().getInt("height"); p++) {
 				int y = (l.getBlockY()+p);
 				Block newBlock = w.getBlockAt(x,y,z);
-				String[] r = Events.plugin.getSettings().getString("num" + n).split(";");
+				String[] r = Main.INSTANCE.getSettings().getString("num" + n).split(";");
 				String[] r2 = new StringBuffer(r[q]).reverse().toString().split(",");
 				if(r2[p].equals("1")) {
 					newBlock.setType(m);
@@ -210,7 +242,7 @@ public class Generator {
 			}
 			br.close();
 		} catch (IOException e) {
-			Events.plugin.console.severe(e + "");
+			Main.INSTANCE.console.severe(e + "");
 		}
 		
 		int n = 0;
@@ -226,7 +258,7 @@ public class Generator {
 			} else {
 				x += u;
 			}
-			for(int v = 0; v < Events.plugin.getSettings().getInt("height"); v++) {
+			for(int v = 0; v < Main.INSTANCE.getSettings().getInt("height"); v++) {
 				int y = l.getBlockY() + v;
 				String toSplit = lines.get(n);
 				String[] data = toSplit.split(":");
@@ -242,9 +274,9 @@ public class Generator {
 		File dir = new File("plugins/DigitalClock/terrainbackups");
 		if(!dir.exists()) {
 			if(dir.mkdir()) {
-				Events.plugin.console.info("[DigitalClock] Directory terrainbackups has been successfully created.");
+				Main.INSTANCE.console.info("[DigitalClock] Directory terrainbackups has been successfully created.");
 			} else {
-				Events.plugin.console.info("[DigitalClock] Directory terrainbackups couldn't be created!");
+				Main.INSTANCE.console.info("[DigitalClock] Directory terrainbackups couldn't be created!");
 			}
 		}
 		File file = new File(dir, clock.getName() + ".txt");
@@ -266,7 +298,7 @@ public class Generator {
 					} else {
 						x += u;
 					}
-					for(int v = 0; v < Events.plugin.getSettings().getInt("height"); v++) {
+					for(int v = 0; v < Main.INSTANCE.getSettings().getInt("height"); v++) {
 						int y = l.getBlockY() + v;
 						String block;
 						if(u == 0 && v == 0) {
@@ -280,18 +312,18 @@ public class Generator {
 				}
 				writer.close();
 			} catch (IOException e) {
-				Events.plugin.console.severe(e + "");
+				Main.INSTANCE.console.severe(e + "");
 			}
 		}
 	}
 	
 	private static int getTotalWidth(Clock clock) {
-		int start = 5 * Events.plugin.getSettings().getInt("width") + 3;
+		int start = 5 * Main.SETTINGS_WIDTH + 3;
 		if(clock.shouldShowSeconds()) {
-			start += 3 * Events.plugin.getSettings().getInt("width") + 1;
+			start += 3 * Main.SETTINGS_WIDTH + 1;
 		}
 		if(clock.getAMPM()) {
-			start += 2 * Events.plugin.getSettings().getInt("width") + 2;
+			start += 2 * Main.SETTINGS_WIDTH + 2;
 		}
 		return start;
 	}

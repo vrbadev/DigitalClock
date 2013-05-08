@@ -1,11 +1,14 @@
 package me.PerwinCZ.DigitalClock;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
+
+import me.PerwinCZ.DigitalClock.mcstats.Metrics;
 
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -21,18 +24,36 @@ public class Main extends JavaPlugin {
 	protected Map<String, Integer> clockTasks = new HashMap<String, Integer>();
 	private FileConfiguration settings = null;
 	private File settingsFile = null;
+	protected static int SETTINGS_WIDTH;
+	protected static Main INSTANCE;
 	
 	public void onEnable() {
 		this.console.info("[DigitalClock] Plugin has been enabled!");
-		this.getServer().getPluginManager().registerEvents(new Events(this), this);
-		this.getServer().getPluginCommand("digitalclock").setExecutor(new Commands(this));
+		
+		// PREPARING SERVER
+		INSTANCE = this;
 		this.saveDefaultConfig();
 		this.reloadConfig();
 		this.saveDefaultSettings();
 		this.reloadSettings();
+		Main.SETTINGS_WIDTH = this.getSettings().getInt("width");
+		
+		// LOADING CLOCKS
 		this.getClocks();
-		this.runTasks();
 		this.console.info("[DigitalClock] Loaded "+ this.clocks.size() +" clock(s).");
+		this.runTasks();
+		
+		// LOADING CLASSES
+		this.getServer().getPluginManager().registerEvents(new Events(), this);
+		this.getServer().getPluginCommand("digitalclock").setExecutor(new Commands());
+		
+		// METRICS
+		try {
+		    Metrics metrics = new Metrics(this);
+		    metrics.start();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	public void onDisable() {
@@ -45,7 +66,7 @@ public class Main extends JavaPlugin {
 			int task = this.getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
 				public void run() {
 						Clock clock = Clock.loadClockByClockName(name);
-						if(Events.plugin.getConfig().getKeys(false).contains(clock.getName())) {
+						if(Main.this.getConfig().getKeys(false).contains(clock.getName())) {
 					    	Generator.start(clock);
 						}
 				}
@@ -59,7 +80,7 @@ public class Main extends JavaPlugin {
 			int task = this.getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
 				public void run() {
 						Clock clock = Clock.loadClockByClockName(name);
-						if(Events.plugin.getConfig().getKeys(false).contains(clock.getName())) {
+						if(Main.this.getConfig().getKeys(false).contains(clock.getName())) {
 					    	Generator.start(clock);
 						}
 				}

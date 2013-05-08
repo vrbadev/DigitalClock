@@ -25,6 +25,7 @@ public class Clock {
 	private boolean ampm;
 	private boolean countdown;
 	private int countdownto;
+	private boolean ingametime;
 	
 	public Clock(String name, String playerName, Block block, Block playersBlock) {
 		this.clockName = name;
@@ -68,27 +69,28 @@ public class Clock {
 	
 	public void write() {
 		if(!this.isSomethingMissing()) {
-			Events.plugin.getConfig().set(this.clockName + ".creator", this.clockCreator);
-			Events.plugin.getConfig().set(this.clockName + ".world", this.startBlock.getWorld().getName());
-			Events.plugin.getConfig().set(this.clockName + ".x", this.startBlock.getX());
-			Events.plugin.getConfig().set(this.clockName + ".y", this.startBlock.getY());
-			Events.plugin.getConfig().set(this.clockName + ".z", this.startBlock.getZ());
-			Events.plugin.getConfig().set(this.clockName + ".x2", this.playersBlock.getX());
-			Events.plugin.getConfig().set(this.clockName + ".y2", this.playersBlock.getY());
-			Events.plugin.getConfig().set(this.clockName + ".z2", this.playersBlock.getZ());
-			Events.plugin.getConfig().set(this.clockName + ".direction", this.direction.name());
-			Events.plugin.getConfig().set(this.clockName + ".material", this.material.name());
-			Events.plugin.getConfig().set(this.clockName + ".data", this.data);
-			Events.plugin.getConfig().set(this.clockName + ".filling", this.fillingMaterial.name());
-			Events.plugin.getConfig().set(this.clockName + ".fdata", this.fillingData);
-			Events.plugin.getConfig().set(this.clockName + ".add", this.addMinutes);
-			Events.plugin.getConfig().set(this.clockName + ".seconds", this.showSeconds);
-			Events.plugin.getConfig().set(this.clockName + ".blinking", this.blinking);
-			Events.plugin.getConfig().set(this.clockName + ".changer", this.blinkingChanger);
-			Events.plugin.getConfig().set(this.clockName + ".ampm", this.ampm);
-			Events.plugin.getConfig().set(this.clockName + ".countdown", this.countdown);
-			Events.plugin.getConfig().set(this.clockName + ".cdt", this.countdownto);
-			Events.plugin.saveConfig();
+			Main.INSTANCE.getConfig().set(this.clockName + ".creator", this.clockCreator);
+			Main.INSTANCE.getConfig().set(this.clockName + ".world", this.startBlock.getWorld().getName());
+			Main.INSTANCE.getConfig().set(this.clockName + ".x", this.startBlock.getX());
+			Main.INSTANCE.getConfig().set(this.clockName + ".y", this.startBlock.getY());
+			Main.INSTANCE.getConfig().set(this.clockName + ".z", this.startBlock.getZ());
+			Main.INSTANCE.getConfig().set(this.clockName + ".x2", this.playersBlock.getX());
+			Main.INSTANCE.getConfig().set(this.clockName + ".y2", this.playersBlock.getY());
+			Main.INSTANCE.getConfig().set(this.clockName + ".z2", this.playersBlock.getZ());
+			Main.INSTANCE.getConfig().set(this.clockName + ".direction", this.direction.name());
+			Main.INSTANCE.getConfig().set(this.clockName + ".material", this.material.name());
+			Main.INSTANCE.getConfig().set(this.clockName + ".data", this.data);
+			Main.INSTANCE.getConfig().set(this.clockName + ".filling", this.fillingMaterial.name());
+			Main.INSTANCE.getConfig().set(this.clockName + ".fdata", this.fillingData);
+			Main.INSTANCE.getConfig().set(this.clockName + ".add", this.addMinutes);
+			Main.INSTANCE.getConfig().set(this.clockName + ".seconds", this.showSeconds);
+			Main.INSTANCE.getConfig().set(this.clockName + ".blinking", this.blinking);
+			Main.INSTANCE.getConfig().set(this.clockName + ".changer", this.blinkingChanger);
+			Main.INSTANCE.getConfig().set(this.clockName + ".ampm", this.ampm);
+			Main.INSTANCE.getConfig().set(this.clockName + ".countdown", this.countdown);
+			Main.INSTANCE.getConfig().set(this.clockName + ".cdt", this.countdownto);
+			Main.INSTANCE.getConfig().set(this.clockName + ".igt", this.ingametime);
+			Main.INSTANCE.saveConfig();
 		} else {
 			throw new NullPointerException();
 		}
@@ -116,6 +118,18 @@ public class Clock {
 		return this.fillingData;
 	}
 	
+	public boolean isIngameTimeEnabled() {
+		this.reloadFromConfig();
+		return this.ingametime;
+	}
+	
+	public void enableIngameTime(boolean b) {
+		Generator.removeClock(this);
+		this.ingametime = b;
+		this.write();
+		Main.INSTANCE.runClock(this.getName());
+	}
+	
 	public Material setFillingMaterial(int id, int md) {
 		this.fillingMaterial = Material.getMaterial(id);
 		this.fillingData = (byte) md;
@@ -124,41 +138,42 @@ public class Clock {
 	}
 
 	public static void remove(Clock clock) {
-		if(Events.plugin.clockTasks.containsKey(clock.getName())) {
-			Events.plugin.getServer().getScheduler().cancelTask(Events.plugin.clockTasks.get(clock.getName()));
-			Events.plugin.clockTasks.remove(clock.getName());
+		if(Main.INSTANCE.clockTasks.containsKey(clock.getName())) {
+			Main.INSTANCE.getServer().getScheduler().cancelTask(Main.INSTANCE.clockTasks.get(clock.getName()));
+			Main.INSTANCE.clockTasks.remove(clock.getName());
 		}
 		Generator.removeClock(clock);
 		clock.setRetrieveData(false);
-		Events.plugin.getConfig().set(clock.getName(), null);
-		Events.plugin.saveConfig();
+		Main.INSTANCE.getConfig().set(clock.getName(), null);
+		Main.INSTANCE.saveConfig();
 	}
 	
     public static Clock loadClockByClockName(String clockName) {
-	    if(Events.plugin.getConfig().getKeys(false).contains(clockName)) {
-			Location loc = new Location(Events.plugin.getServer().getWorld(Events.plugin.getConfig().getString(clockName + ".world")), Events.plugin.getConfig().getInt(clockName + ".x"), Events.plugin.getConfig().getInt(clockName + ".y"), Events.plugin.getConfig().getInt(clockName + ".z"));
-			Location loc2 = new Location(Events.plugin.getServer().getWorld(Events.plugin.getConfig().getString(clockName + ".world")), Events.plugin.getConfig().getInt(clockName + ".x2"), Events.plugin.getConfig().getInt(clockName + ".y2"), Events.plugin.getConfig().getInt(clockName + ".z2"));
-	    	return new Clock(clockName, Events.plugin.getConfig().getString(clockName + ".creator"), Events.plugin.getServer().getWorld(Events.plugin.getConfig().getString(clockName + ".world")).getBlockAt(loc), Events.plugin.getServer().getWorld(Events.plugin.getConfig().getString(clockName + ".world")).getBlockAt(loc2));
+	    if(Main.INSTANCE.getConfig().getKeys(false).contains(clockName)) {
+			Location loc = new Location(Main.INSTANCE.getServer().getWorld(Main.INSTANCE.getConfig().getString(clockName + ".world")), Main.INSTANCE.getConfig().getInt(clockName + ".x"), Main.INSTANCE.getConfig().getInt(clockName + ".y"), Main.INSTANCE.getConfig().getInt(clockName + ".z"));
+			Location loc2 = new Location(Main.INSTANCE.getServer().getWorld(Main.INSTANCE.getConfig().getString(clockName + ".world")), Main.INSTANCE.getConfig().getInt(clockName + ".x2"), Main.INSTANCE.getConfig().getInt(clockName + ".y2"), Main.INSTANCE.getConfig().getInt(clockName + ".z2"));
+	    	return new Clock(clockName, Main.INSTANCE.getConfig().getString(clockName + ".creator"), Main.INSTANCE.getServer().getWorld(Main.INSTANCE.getConfig().getString(clockName + ".world")).getBlockAt(loc), Main.INSTANCE.getServer().getWorld(Main.INSTANCE.getConfig().getString(clockName + ".world")).getBlockAt(loc2));
 	    }
 		return null;
 	}
 	
     public void reloadFromConfig() {
-    	if(Events.plugin.getConfig().getKeys(false).contains(this.clockName) && this.retrieveData == true) {
-        	this.location = new Location(Events.plugin.getServer().getWorld(Events.plugin.getConfig().getString(this.clockName + ".world")), Events.plugin.getConfig().getInt(this.clockName + ".x"), Events.plugin.getConfig().getInt(this.clockName + ".y"), Events.plugin.getConfig().getInt(this.clockName + ".z"));
-        	this.clockCreator = Events.plugin.getConfig().getString(this.clockName + ".creator");
-        	this.direction = BlockFace.valueOf(Events.plugin.getConfig().getString(this.clockName + ".direction"));
-        	this.material = Material.valueOf(Events.plugin.getConfig().getString(this.clockName + ".material"));
-        	this.data = (byte) Events.plugin.getConfig().getInt(this.clockName + ".data");
-        	this.fillingMaterial = Material.valueOf(Events.plugin.getConfig().getString(this.clockName + ".filling"));
-        	this.fillingData = (byte) Events.plugin.getConfig().getInt(this.clockName + ".fdata");
-        	this.addMinutes = Integer.parseInt(Events.plugin.getConfig().getString(this.clockName + ".add"));
-        	this.showSeconds = Boolean.parseBoolean(Events.plugin.getConfig().getString(this.clockName + ".seconds"));
-        	this.blinking = Boolean.parseBoolean(Events.plugin.getConfig().getString(this.clockName + ".blinking"));
-        	this.blinkingChanger = Boolean.parseBoolean(Events.plugin.getConfig().getString(this.clockName + ".changer"));
-        	this.ampm = Boolean.parseBoolean(Events.plugin.getConfig().getString(this.clockName + ".ampm"));
-        	this.countdown = Boolean.parseBoolean(Events.plugin.getConfig().getString(this.clockName + ".countdown"));
-        	this.countdownto = Events.plugin.getConfig().getInt(this.clockName + ".cdt");
+    	if(Main.INSTANCE.getConfig().getKeys(false).contains(this.clockName) && this.retrieveData == true) {
+        	this.location = new Location(Main.INSTANCE.getServer().getWorld(Main.INSTANCE.getConfig().getString(this.clockName + ".world")), Main.INSTANCE.getConfig().getInt(this.clockName + ".x"), Main.INSTANCE.getConfig().getInt(this.clockName + ".y"), Main.INSTANCE.getConfig().getInt(this.clockName + ".z"));
+        	this.clockCreator = Main.INSTANCE.getConfig().getString(this.clockName + ".creator");
+        	this.direction = BlockFace.valueOf(Main.INSTANCE.getConfig().getString(this.clockName + ".direction"));
+        	this.material = Material.valueOf(Main.INSTANCE.getConfig().getString(this.clockName + ".material"));
+        	this.data = (byte) Main.INSTANCE.getConfig().getInt(this.clockName + ".data");
+        	this.fillingMaterial = Material.valueOf(Main.INSTANCE.getConfig().getString(this.clockName + ".filling"));
+        	this.fillingData = (byte) Main.INSTANCE.getConfig().getInt(this.clockName + ".fdata");
+        	this.addMinutes = Integer.parseInt(Main.INSTANCE.getConfig().getString(this.clockName + ".add"));
+        	this.showSeconds = Boolean.parseBoolean(Main.INSTANCE.getConfig().getString(this.clockName + ".seconds"));
+        	this.blinking = Boolean.parseBoolean(Main.INSTANCE.getConfig().getString(this.clockName + ".blinking"));
+        	this.blinkingChanger = Boolean.parseBoolean(Main.INSTANCE.getConfig().getString(this.clockName + ".changer"));
+        	this.ampm = Boolean.parseBoolean(Main.INSTANCE.getConfig().getString(this.clockName + ".ampm"));
+        	this.countdown = Boolean.parseBoolean(Main.INSTANCE.getConfig().getString(this.clockName + ".countdown"));
+        	this.countdownto = Main.INSTANCE.getConfig().getInt(this.clockName + ".cdt");
+        	this.ingametime = Boolean.parseBoolean(Main.INSTANCE.getConfig().getString(this.clockName + ".igt"));
         }
     }
     
@@ -215,7 +230,7 @@ public class Clock {
 		Generator.removeClock(this);
 		this.showSeconds = ss;
 		this.write();
-		Events.plugin.runClock(this.getName());
+		Main.INSTANCE.runClock(this.getName());
 	}
 	
 	public void setBlinking(boolean bl) {
@@ -239,12 +254,12 @@ public class Clock {
 		return this.ampm;
 	}
 	
-	public void setBlinkingChanger(boolean blm) {
+	protected void setBlinkingChanger(boolean blm) {
 		this.blinkingChanger = blm;
 		this.write();
 	}
 	
-	public boolean isBlinkingChangerON() {
+	protected boolean isBlinkingChangerON() {
 		this.reloadFromConfig();
 		return this.blinkingChanger;
 	}
@@ -331,11 +346,11 @@ public class Clock {
 		return null;
 	}
 	
-	public void setRetrieveData(boolean retrieveData) {
+	protected void setRetrieveData(boolean retrieveData) {
 		this.retrieveData = retrieveData;
 	}
 	
-	public boolean isSomethingMissing() {
+	protected boolean isSomethingMissing() {
 		if(this.clockCreator != null && this.clockName != null && this.startBlock != null && this.direction != null && this.location != null && this.material != null) {
 			return false;
 		}
