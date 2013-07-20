@@ -69,28 +69,28 @@ public class Clock {
 	
 	public void write() {
 		if(!this.isSomethingMissing()) {
-			Main.INSTANCE.getConfig().set(this.clockName + ".creator", this.clockCreator);
-			Main.INSTANCE.getConfig().set(this.clockName + ".world", this.startBlock.getWorld().getName());
-			Main.INSTANCE.getConfig().set(this.clockName + ".x", this.startBlock.getX());
-			Main.INSTANCE.getConfig().set(this.clockName + ".y", this.startBlock.getY());
-			Main.INSTANCE.getConfig().set(this.clockName + ".z", this.startBlock.getZ());
-			Main.INSTANCE.getConfig().set(this.clockName + ".x2", this.playersBlock.getX());
-			Main.INSTANCE.getConfig().set(this.clockName + ".y2", this.playersBlock.getY());
-			Main.INSTANCE.getConfig().set(this.clockName + ".z2", this.playersBlock.getZ());
-			Main.INSTANCE.getConfig().set(this.clockName + ".direction", this.direction.name());
-			Main.INSTANCE.getConfig().set(this.clockName + ".material", this.material.name());
-			Main.INSTANCE.getConfig().set(this.clockName + ".data", this.data);
-			Main.INSTANCE.getConfig().set(this.clockName + ".filling", this.fillingMaterial.name());
-			Main.INSTANCE.getConfig().set(this.clockName + ".fdata", this.fillingData);
-			Main.INSTANCE.getConfig().set(this.clockName + ".add", this.addMinutes);
-			Main.INSTANCE.getConfig().set(this.clockName + ".seconds", this.showSeconds);
-			Main.INSTANCE.getConfig().set(this.clockName + ".blinking", this.blinking);
-			Main.INSTANCE.getConfig().set(this.clockName + ".changer", this.blinkingChanger);
-			Main.INSTANCE.getConfig().set(this.clockName + ".ampm", this.ampm);
-			Main.INSTANCE.getConfig().set(this.clockName + ".countdown", this.countdown);
-			Main.INSTANCE.getConfig().set(this.clockName + ".cdt", this.countdownto);
-			Main.INSTANCE.getConfig().set(this.clockName + ".igt", this.ingametime);
-			Main.INSTANCE.saveConfig();
+			Main.i.clocksConf.set(this.clockName + ".creator", this.clockCreator);
+			Main.i.clocksConf.set(this.clockName + ".world", this.startBlock.getWorld().getName());
+			Main.i.clocksConf.set(this.clockName + ".x", this.startBlock.getX());
+			Main.i.clocksConf.set(this.clockName + ".y", this.startBlock.getY());
+			Main.i.clocksConf.set(this.clockName + ".z", this.startBlock.getZ());
+			Main.i.clocksConf.set(this.clockName + ".x2", this.playersBlock.getX());
+			Main.i.clocksConf.set(this.clockName + ".y2", this.playersBlock.getY());
+			Main.i.clocksConf.set(this.clockName + ".z2", this.playersBlock.getZ());
+			Main.i.clocksConf.set(this.clockName + ".direction", this.direction.name());
+			Main.i.clocksConf.set(this.clockName + ".material", this.material.name());
+			Main.i.clocksConf.set(this.clockName + ".data", this.data);
+			Main.i.clocksConf.set(this.clockName + ".filling", this.fillingMaterial.name());
+			Main.i.clocksConf.set(this.clockName + ".fdata", this.fillingData);
+			Main.i.clocksConf.set(this.clockName + ".add", this.addMinutes);
+			Main.i.clocksConf.set(this.clockName + ".seconds", this.showSeconds);
+			Main.i.clocksConf.set(this.clockName + ".blinking", this.blinking);
+			Main.i.clocksConf.set(this.clockName + ".changer", this.blinkingChanger);
+			Main.i.clocksConf.set(this.clockName + ".ampm", this.ampm);
+			Main.i.clocksConf.set(this.clockName + ".countdown", this.countdown);
+			Main.i.clocksConf.set(this.clockName + ".cdt", this.countdownto);
+			Main.i.clocksConf.set(this.clockName + ".igt", this.ingametime);
+			//Main.i.saveConfig();
 		} else {
 			throw new NullPointerException();
 		}
@@ -127,7 +127,7 @@ public class Clock {
 		Generator.removeClock(this);
 		this.ingametime = b;
 		this.write();
-		Main.INSTANCE.runClock(this.getName());
+		Main.i.runClock(this.getName());
 	}
 	
 	public Material setFillingMaterial(int id, int md) {
@@ -138,42 +138,42 @@ public class Clock {
 	}
 
 	public static void remove(Clock clock) {
-		if(Main.INSTANCE.clockTasks.containsKey(clock.getName())) {
-			Main.INSTANCE.getServer().getScheduler().cancelTask(Main.INSTANCE.clockTasks.get(clock.getName()));
-			Main.INSTANCE.clockTasks.remove(clock.getName());
+		if(Main.i.clockTasks.containsKey(clock.getName())) {
+			Main.i.getServer().getScheduler().cancelTask(Main.i.clockTasks.get(clock.getName()));
+			Main.i.clockTasks.remove(clock.getName());
 		}
 		Generator.removeClock(clock);
 		clock.setRetrieveData(false);
-		Main.INSTANCE.getConfig().set(clock.getName(), null);
-		Main.INSTANCE.saveConfig();
+		Main.i.clocksConf.set(clock.getName(), null);
+		//Main.i.saveConfig();
 	}
 	
     public static Clock loadClockByClockName(String clockName) {
-	    if(Main.INSTANCE.getConfig().getKeys(false).contains(clockName)) {
-			Location loc = new Location(Main.INSTANCE.getServer().getWorld(Main.INSTANCE.getConfig().getString(clockName + ".world")), Main.INSTANCE.getConfig().getInt(clockName + ".x"), Main.INSTANCE.getConfig().getInt(clockName + ".y"), Main.INSTANCE.getConfig().getInt(clockName + ".z"));
-			Location loc2 = new Location(Main.INSTANCE.getServer().getWorld(Main.INSTANCE.getConfig().getString(clockName + ".world")), Main.INSTANCE.getConfig().getInt(clockName + ".x2"), Main.INSTANCE.getConfig().getInt(clockName + ".y2"), Main.INSTANCE.getConfig().getInt(clockName + ".z2"));
-	    	return new Clock(clockName, Main.INSTANCE.getConfig().getString(clockName + ".creator"), Main.INSTANCE.getServer().getWorld(Main.INSTANCE.getConfig().getString(clockName + ".world")).getBlockAt(loc), Main.INSTANCE.getServer().getWorld(Main.INSTANCE.getConfig().getString(clockName + ".world")).getBlockAt(loc2));
+	    if(Main.i.clocksConf.getKeys(false).contains(clockName)) {
+			Location loc = new Location(Main.i.getServer().getWorld(Main.i.clocksConf.getString(clockName + ".world")), Main.i.clocksConf.getInt(clockName + ".x"), Main.i.clocksConf.getInt(clockName + ".y"), Main.i.clocksConf.getInt(clockName + ".z"));
+			Location loc2 = new Location(Main.i.getServer().getWorld(Main.i.clocksConf.getString(clockName + ".world")), Main.i.clocksConf.getInt(clockName + ".x2"), Main.i.clocksConf.getInt(clockName + ".y2"), Main.i.clocksConf.getInt(clockName + ".z2"));
+	    	return new Clock(clockName, Main.i.clocksConf.getString(clockName + ".creator"), Main.i.getServer().getWorld(Main.i.clocksConf.getString(clockName + ".world")).getBlockAt(loc), Main.i.getServer().getWorld(Main.i.clocksConf.getString(clockName + ".world")).getBlockAt(loc2));
 	    }
 		return null;
 	}
 	
     public void reloadFromConfig() {
-    	if(Main.INSTANCE.getConfig().getKeys(false).contains(this.clockName) && this.retrieveData == true) {
-        	this.location = new Location(Main.INSTANCE.getServer().getWorld(Main.INSTANCE.getConfig().getString(this.clockName + ".world")), Main.INSTANCE.getConfig().getInt(this.clockName + ".x"), Main.INSTANCE.getConfig().getInt(this.clockName + ".y"), Main.INSTANCE.getConfig().getInt(this.clockName + ".z"));
-        	this.clockCreator = Main.INSTANCE.getConfig().getString(this.clockName + ".creator");
-        	this.direction = BlockFace.valueOf(Main.INSTANCE.getConfig().getString(this.clockName + ".direction"));
-        	this.material = Material.valueOf(Main.INSTANCE.getConfig().getString(this.clockName + ".material"));
-        	this.data = (byte) Main.INSTANCE.getConfig().getInt(this.clockName + ".data");
-        	this.fillingMaterial = Material.valueOf(Main.INSTANCE.getConfig().getString(this.clockName + ".filling"));
-        	this.fillingData = (byte) Main.INSTANCE.getConfig().getInt(this.clockName + ".fdata");
-        	this.addMinutes = Integer.parseInt(Main.INSTANCE.getConfig().getString(this.clockName + ".add"));
-        	this.showSeconds = Boolean.parseBoolean(Main.INSTANCE.getConfig().getString(this.clockName + ".seconds"));
-        	this.blinking = Boolean.parseBoolean(Main.INSTANCE.getConfig().getString(this.clockName + ".blinking"));
-        	this.blinkingChanger = Boolean.parseBoolean(Main.INSTANCE.getConfig().getString(this.clockName + ".changer"));
-        	this.ampm = Boolean.parseBoolean(Main.INSTANCE.getConfig().getString(this.clockName + ".ampm"));
-        	this.countdown = Boolean.parseBoolean(Main.INSTANCE.getConfig().getString(this.clockName + ".countdown"));
-        	this.countdownto = Main.INSTANCE.getConfig().getInt(this.clockName + ".cdt");
-        	this.ingametime = Boolean.parseBoolean(Main.INSTANCE.getConfig().getString(this.clockName + ".igt"));
+    	if(Main.i.clocksConf.getKeys(false).contains(this.clockName) && this.retrieveData == true) {
+        	this.location = new Location(Main.i.getServer().getWorld(Main.i.clocksConf.getString(this.clockName + ".world")), Main.i.clocksConf.getInt(this.clockName + ".x"), Main.i.clocksConf.getInt(this.clockName + ".y"), Main.i.clocksConf.getInt(this.clockName + ".z"));
+        	this.clockCreator = Main.i.clocksConf.getString(this.clockName + ".creator");
+        	this.direction = BlockFace.valueOf(Main.i.clocksConf.getString(this.clockName + ".direction"));
+        	this.material = Material.valueOf(Main.i.clocksConf.getString(this.clockName + ".material"));
+        	this.data = (byte) Main.i.clocksConf.getInt(this.clockName + ".data");
+        	this.fillingMaterial = Material.valueOf(Main.i.clocksConf.getString(this.clockName + ".filling"));
+        	this.fillingData = (byte) Main.i.clocksConf.getInt(this.clockName + ".fdata");
+        	this.addMinutes = Integer.parseInt(Main.i.clocksConf.getString(this.clockName + ".add"));
+        	this.showSeconds = Boolean.parseBoolean(Main.i.clocksConf.getString(this.clockName + ".seconds"));
+        	this.blinking = Boolean.parseBoolean(Main.i.clocksConf.getString(this.clockName + ".blinking"));
+        	this.blinkingChanger = Boolean.parseBoolean(Main.i.clocksConf.getString(this.clockName + ".changer"));
+        	this.ampm = Boolean.parseBoolean(Main.i.clocksConf.getString(this.clockName + ".ampm"));
+        	this.countdown = Boolean.parseBoolean(Main.i.clocksConf.getString(this.clockName + ".countdown"));
+        	this.countdownto = Main.i.clocksConf.getInt(this.clockName + ".cdt");
+        	this.ingametime = Boolean.parseBoolean(Main.i.clocksConf.getString(this.clockName + ".igt"));
         }
     }
     
@@ -230,7 +230,7 @@ public class Clock {
 		Generator.removeClock(this);
 		this.showSeconds = ss;
 		this.write();
-		Main.INSTANCE.runClock(this.getName());
+		Main.i.runClock(this.getName());
 	}
 	
 	public void setBlinking(boolean bl) {

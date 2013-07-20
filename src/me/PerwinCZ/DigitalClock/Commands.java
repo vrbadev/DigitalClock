@@ -16,22 +16,22 @@ public class Commands implements CommandExecutor {
 						if(args.length != 2) {
 							player.sendMessage(ChatColor.RED + "[DigitalClock] Correct usage: '/digitalclock create <name>'");
 						} else if(!player.hasPermission("digitalclock.create") && !player.isOp()) {
-							player.sendMessage(ChatColor.RED + "[DigitalClock] You aren't allowed to use Main.INSTANCE command!");
-						} else if(Main.INSTANCE.enableBuildUsers.containsKey(player)) {
+							player.sendMessage(ChatColor.RED + "[DigitalClock] You aren't allowed to use this command!");
+						} else if(Main.i.enableBuildUsers.containsKey(player)) {
 							player.sendMessage(ChatColor.RED + "[DigitalClock] You are just creating another clock. You can't create more clocks in the same time!");
-						} else if(Main.INSTANCE.getConfig().getKeys(false).contains(args[1])) {
-							player.sendMessage(ChatColor.RED + "[DigitalClock] Clock with Main.INSTANCE name already exists!");
+						} else if(Main.i.clocksConf.getKeys(false).contains(args[1])) {
+							player.sendMessage(ChatColor.RED + "[DigitalClock] Clock with Main.i name already exists!");
 						} else {
 							int count = 0;
-							if(Main.INSTANCE.usersClock.get(player.getName()) != null) {
-								count = Main.INSTANCE.usersClock.get(player.getName());
+							if(Main.i.usersClock.get(player.getName()) != null) {
+								count = Main.i.usersClock.get(player.getName());
 							}
 							boolean limitReached = false;
 							if(player.hasPermission("digitalclock.limit." + count) && count != 0 && !player.isOp() && !player.hasPermission("digitalclock.limit.*")) {
 								limitReached = true;
 							}
 							if(limitReached == false) {
-						    	Main.INSTANCE.enableBuildUsers.put(player, args[1]);
+						    	Main.i.enableBuildUsers.put(player, args[1]);
 						      	player.sendMessage(ChatColor.GREEN + "[DigitalClock] Now you can create your " + (count+1) + ". clock. Click with any block anywhere to set start block.");
 							} else {
 						      	player.sendMessage(ChatColor.RED + "[DigitalClock] You can't create next clock. You have reached the limit of " + count + " clocks.");
@@ -41,21 +41,21 @@ public class Commands implements CommandExecutor {
 						if(args.length != 2) {
 							player.sendMessage(ChatColor.RED + "[DigitalClock] Correct usage: '/digitalclock remove <name>'");
 						} else if(!player.hasPermission("digitalclock.remove") && !player.isOp()) {
-							player.sendMessage(ChatColor.RED + "[DigitalClock] You aren't allowed to use Main.INSTANCE command!");
-						} else if(!Main.INSTANCE.getConfig().getKeys(false).contains(args[1])) {
+							player.sendMessage(ChatColor.RED + "[DigitalClock] You aren't allowed to use this command!");
+						} else if(!Main.i.clocksConf.getKeys(false).contains(args[1])) {
 							player.sendMessage(ChatColor.RED + "[DigitalClock] Clock '" + args[1] + "' not found!");
 						} else {		
 							Clock clock = Clock.loadClockByClockName(args[1]);
 							Clock.remove(clock);
-							Main.INSTANCE.getClocks();
+							Main.i.getClocks();
 							player.sendMessage(ChatColor.GREEN + "[DigitalClock] Your clock '" + args[1] + "' has been successfully removed.");
 						}
 					} else if(args[0].equals("rotate")) { // 3
 						if(args.length != 3) {
 							player.sendMessage(ChatColor.RED + "[DigitalClock] Correct usage: '/digitalclock rotate <name> <direction>'");
 						} else if(!player.hasPermission("digitalclock.rotate") && !player.isOp()) {
-							player.sendMessage(ChatColor.RED + "[DigitalClock] You aren't allowed to use Main.INSTANCE command!");
-						} else if(!Main.INSTANCE.getConfig().getKeys(false).contains(args[1])) {
+							player.sendMessage(ChatColor.RED + "[DigitalClock] You aren't allowed to use this command!");
+						} else if(!Main.i.clocksConf.getKeys(false).contains(args[1])) {
 							player.sendMessage(ChatColor.RED + "[DigitalClock] Clock '" + args[1] + "' not found!");
 						} else if(!args[2].equals("north") && !args[2].equals("south") && !args[2].equals("east") && !args[2].equals("west")) {
 							player.sendMessage(ChatColor.RED + "[DigitalClock] Direction can be only north, south, east or west!");
@@ -67,8 +67,8 @@ public class Commands implements CommandExecutor {
 						if(args.length != 3) {
 							player.sendMessage(ChatColor.RED + "[DigitalClock] Correct usage: '/digitalclock material <name> <material id:data>'");
 						} else if(!player.hasPermission("digitalclock.material") && !player.isOp()) {
-							player.sendMessage(ChatColor.RED + "[DigitalClock] You aren't allowed to use Main.INSTANCE command!");
-						} else if(!Main.INSTANCE.getConfig().getKeys(false).contains(args[1])) {
+							player.sendMessage(ChatColor.RED + "[DigitalClock] You aren't allowed to use this command!");
+						} else if(!Main.i.clocksConf.getKeys(false).contains(args[1])) {
 							player.sendMessage(ChatColor.RED + "[DigitalClock] Clock '" + args[1] + "' not found!");
 						} else {	
 							Clock clock = Clock.loadClockByClockName(args[1]);
@@ -85,8 +85,8 @@ public class Commands implements CommandExecutor {
 						if(args.length != 3) {
 							player.sendMessage(ChatColor.RED + "[DigitalClock] Correct usage: '/digitalclock fill <name> <material id:data>'");
 						} else if(!player.hasPermission("digitalclock.fill") && !player.isOp()) {
-							player.sendMessage(ChatColor.RED + "[DigitalClock] You aren't allowed to use Main.INSTANCE command!");
-						} else if(!Main.INSTANCE.getConfig().getKeys(false).contains(args[1])) {
+							player.sendMessage(ChatColor.RED + "[DigitalClock] You aren't allowed to use this command!");
+						} else if(!Main.i.clocksConf.getKeys(false).contains(args[1])) {
 							player.sendMessage(ChatColor.RED + "[DigitalClock] Clock '" + args[1] + "' not found!");
 						} else {	
 							Clock clock = Clock.loadClockByClockName(args[1]);
@@ -103,22 +103,22 @@ public class Commands implements CommandExecutor {
 						if(args.length != 2) {
 							player.sendMessage(ChatColor.RED + "[DigitalClock] Correct usage: '/digitalclock move <name>'");
 						} else if(!player.hasPermission("digitalclock.move") && !player.isOp()) {
-							player.sendMessage(ChatColor.RED + "[DigitalClock] You aren't allowed to use Main.INSTANCE command!");
-						} else if(!Main.INSTANCE.getConfig().getKeys(false).contains(args[1])) {
+							player.sendMessage(ChatColor.RED + "[DigitalClock] You aren't allowed to use this command!");
+						} else if(!Main.i.clocksConf.getKeys(false).contains(args[1])) {
 							player.sendMessage(ChatColor.RED + "[DigitalClock] Clock '" + args[1] + "' not found!");
-						} else if(Main.INSTANCE.enableMoveUsers.containsKey(player)) {
+						} else if(Main.i.enableMoveUsers.containsKey(player)) {
 							player.sendMessage(ChatColor.GREEN + "[DigitalClock] Moving clock '" + args[1] + "' has been rejected!");
-							Main.INSTANCE.enableMoveUsers.remove(player);
+							Main.i.enableMoveUsers.remove(player);
 						} else {	
-							Main.INSTANCE.enableMoveUsers.put(player, args[1]);
+							Main.i.enableMoveUsers.put(player, args[1]);
 							player.sendMessage(ChatColor.GREEN + "[DigitalClock] Moving clock '" + args[1] + "' has been enabled. Now just right click to some place to move your clock there.");
 						}
 					} else if(args[0].equals("addingminutes")) { // 7
 						if(args.length != 3) {
 							player.sendMessage(ChatColor.RED + "[DigitalClock] Correct usage: '/digitalclock addingminutes <name> <minutes>'");
 						} else if(!player.hasPermission("digitalclock.addingminutes") && !player.isOp()) {
-							player.sendMessage(ChatColor.RED + "[DigitalClock] You aren't allowed to use Main.INSTANCE command!");
-						} else if(!Main.INSTANCE.getConfig().getKeys(false).contains(args[1])) {
+							player.sendMessage(ChatColor.RED + "[DigitalClock] You aren't allowed to use this command!");
+						} else if(!Main.i.clocksConf.getKeys(false).contains(args[1])) {
 							player.sendMessage(ChatColor.RED + "[DigitalClock] Clock '" + args[1] + "' not found!");
 						} else {
 							int mins = Integer.parseInt(args[2]);
@@ -134,8 +134,8 @@ public class Commands implements CommandExecutor {
 						if(args.length != 2) {
 							player.sendMessage(ChatColor.RED + "[DigitalClock] Correct usage: '/digitalclock tp <name>'");
 						} else if(!player.hasPermission("digitalclock.tp") && !player.isOp()) {
-							player.sendMessage(ChatColor.RED + "[DigitalClock] You aren't allowed to use Main.INSTANCE command!");
-						} else if(!Main.INSTANCE.getConfig().getKeys(false).contains(args[1])) {
+							player.sendMessage(ChatColor.RED + "[DigitalClock] You aren't allowed to use this command!");
+						} else if(!Main.i.clocksConf.getKeys(false).contains(args[1])) {
 							player.sendMessage(ChatColor.RED + "[DigitalClock] Clock '" + args[1] + "' not found!");
 						} else {	
 							Clock clock = Clock.loadClockByClockName(args[1]);
@@ -146,35 +146,35 @@ public class Commands implements CommandExecutor {
 						if(args.length != 2) {
 							player.sendMessage(ChatColor.RED + "[DigitalClock] Correct usage: '/digitalclock stopclock <name>'");
 						} else if(!player.hasPermission("digitalclock.stopclock") && !player.isOp()) {
-							player.sendMessage(ChatColor.RED + "[DigitalClock] You aren't allowed to use Main.INSTANCE command!");
-						} else if(!Main.INSTANCE.getConfig().getKeys(false).contains(args[1])) {
+							player.sendMessage(ChatColor.RED + "[DigitalClock] You aren't allowed to use this command!");
+						} else if(!Main.i.clocksConf.getKeys(false).contains(args[1])) {
 							player.sendMessage(ChatColor.RED + "[DigitalClock] Clock '" + args[1] + "' not found!");
-						} else if(!Main.INSTANCE.clockTasks.containsKey(args[1])) {
+						} else if(!Main.i.clockTasks.containsKey(args[1])) {
 							player.sendMessage(ChatColor.RED + "[DigitalClock] Clock '"+ args[1] +"' is already stopped!");
 						} else {	
-							Main.INSTANCE.getServer().getScheduler().cancelTask(Main.INSTANCE.clockTasks.get(args[1]));
-							player.sendMessage(ChatColor.GREEN + "[DigitalClock] You have successfully stopped clock '" + args[1] + "' (task number " + Main.INSTANCE.clockTasks.get(args[1]) + ").");
-							Main.INSTANCE.clockTasks.remove(args[1]);
+							Main.i.getServer().getScheduler().cancelTask(Main.i.clockTasks.get(args[1]));
+							player.sendMessage(ChatColor.GREEN + "[DigitalClock] You have successfully stopped clock '" + args[1] + "' (task number " + Main.i.clockTasks.get(args[1]) + ").");
+							Main.i.clockTasks.remove(args[1]);
 						}
 					} else if(args[0].equals("runclock")) { // 10
 						if(args.length != 2) {
 							player.sendMessage(ChatColor.RED + "[DigitalClock] Correct usage: '/digitalclock runclock <name>'");
 						} else if(!player.hasPermission("digitalclock.runclock") && !player.isOp()) {
-							player.sendMessage(ChatColor.RED + "[DigitalClock] You aren't allowed to use Main.INSTANCE command!");
-						} else if(!Main.INSTANCE.getConfig().getKeys(false).contains(args[1])) {
+							player.sendMessage(ChatColor.RED + "[DigitalClock] You aren't allowed to use this command!");
+						} else if(!Main.i.clocksConf.getKeys(false).contains(args[1])) {
 							player.sendMessage(ChatColor.RED + "[DigitalClock] Clock '" + args[1] + "' not found!");
-						} else if(Main.INSTANCE.clockTasks.containsKey(args[1])) {
+						} else if(Main.i.clockTasks.containsKey(args[1])) {
 							player.sendMessage(ChatColor.RED + "[DigitalClock] Clock '"+ args[1] +"' is already running!");
 						} else {	
-							Main.INSTANCE.runClock(args[1]);
-							player.sendMessage(ChatColor.GREEN + "[DigitalClock] Clock '" + args[1] + "' is now running under task number " + Main.INSTANCE.clockTasks.get(args[1]) + ".");
+							Main.i.runClock(args[1]);
+							player.sendMessage(ChatColor.GREEN + "[DigitalClock] Clock '" + args[1] + "' is now running under task number " + Main.i.clockTasks.get(args[1]) + ".");
 						}
 					} else if(args[0].equals("toggleseconds")) { // 11
 						if(args.length != 2) {
 							player.sendMessage(ChatColor.RED + "[DigitalClock] Correct usage: '/digitalclock toggleseconds <name>'");
 						} else if(!player.hasPermission("digitalclock.toggleseconds") && !player.isOp()) {
-							player.sendMessage(ChatColor.RED + "[DigitalClock] You aren't allowed to use Main.INSTANCE command!");
-						} else if(!Main.INSTANCE.getConfig().getKeys(false).contains(args[1])) {
+							player.sendMessage(ChatColor.RED + "[DigitalClock] You aren't allowed to use this command!");
+						} else if(!Main.i.clocksConf.getKeys(false).contains(args[1])) {
 							player.sendMessage(ChatColor.RED + "[DigitalClock] Clock '" + args[1] + "' not found!");
 						} else {	
 							Clock clock = Clock.loadClockByClockName(args[1]);
@@ -190,8 +190,8 @@ public class Commands implements CommandExecutor {
 							if(args.length != 2) {
 								player.sendMessage(ChatColor.RED + "[DigitalClock] Correct usage: '/digitalclock toggleingametime <name>'");
 							} else if(!player.hasPermission("digitalclock.toggleingametime") && !player.isOp()) {
-								player.sendMessage(ChatColor.RED + "[DigitalClock] You aren't allowed to use Main.INSTANCE command!");
-							} else if(!Main.INSTANCE.getConfig().getKeys(false).contains(args[1])) {
+								player.sendMessage(ChatColor.RED + "[DigitalClock] You aren't allowed to use this command!");
+							} else if(!Main.i.clocksConf.getKeys(false).contains(args[1])) {
 								player.sendMessage(ChatColor.RED + "[DigitalClock] Clock '" + args[1] + "' not found!");
 							} else {	
 								Clock clock = Clock.loadClockByClockName(args[1]);
@@ -207,8 +207,8 @@ public class Commands implements CommandExecutor {
 						if(args.length != 2) {
 							player.sendMessage(ChatColor.RED + "[DigitalClock] Correct usage: '/digitalclock toggleampm <name>'");
 						} else if(!player.hasPermission("digitalclock.toggleampm") && !player.isOp()) {
-							player.sendMessage(ChatColor.RED + "[DigitalClock] You aren't allowed to use Main.INSTANCE command!");
-						} else if(!Main.INSTANCE.getConfig().getKeys(false).contains(args[1])) {
+							player.sendMessage(ChatColor.RED + "[DigitalClock] You aren't allowed to use this command!");
+						} else if(!Main.i.clocksConf.getKeys(false).contains(args[1])) {
 							player.sendMessage(ChatColor.RED + "[DigitalClock] Clock '" + args[1] + "' not found!");
 						} else {	
 							Clock clock = Clock.loadClockByClockName(args[1]);
@@ -224,8 +224,8 @@ public class Commands implements CommandExecutor {
 						if(args.length != 2) {
 							player.sendMessage(ChatColor.RED + "[DigitalClock] Correct usage: '/digitalclock toggleblinking <name>'");
 						} else if(!player.hasPermission("digitalclock.toggleblinking") && !player.isOp()) {
-							player.sendMessage(ChatColor.RED + "[DigitalClock] You aren't allowed to use Main.INSTANCE command!");
-						} else if(!Main.INSTANCE.getConfig().getKeys(false).contains(args[1])) {
+							player.sendMessage(ChatColor.RED + "[DigitalClock] You aren't allowed to use this command!");
+						} else if(!Main.i.clocksConf.getKeys(false).contains(args[1])) {
 							player.sendMessage(ChatColor.RED + "[DigitalClock] Clock '" + args[1] + "' not found!");
 						} else {
 							Clock clock = Clock.loadClockByClockName(args[1]);
@@ -241,8 +241,8 @@ public class Commands implements CommandExecutor {
 						if(args.length != 3) {
 							player.sendMessage(ChatColor.RED + "[DigitalClock] Correct usage: '/digitalclock setcountdown <name> <seconds>'");
 						} else if(!player.hasPermission("digitalclock.setcountdown") && !player.isOp()) {
-							player.sendMessage(ChatColor.RED + "[DigitalClock] You aren't allowed to use Main.INSTANCE command!");
-						} else if(!Main.INSTANCE.getConfig().getKeys(false).contains(args[1])) {
+							player.sendMessage(ChatColor.RED + "[DigitalClock] You aren't allowed to use this command!");
+						} else if(!Main.i.clocksConf.getKeys(false).contains(args[1])) {
 							player.sendMessage(ChatColor.RED + "[DigitalClock] Clock '" + args[1] + "' not found!");
 						} else if(Clock.loadClockByClockName(args[1]).isCountdownEnabled()) {
 							player.sendMessage(ChatColor.RED + "[DigitalClock] Clock '" + args[1] + "' has already enabled countdown mode! Disable it with command '/digitalclock disablecountdown <name>'.");
@@ -252,52 +252,52 @@ public class Commands implements CommandExecutor {
 							Clock clock = Clock.loadClockByClockName(args[1]);
 							clock.setCountdownTime(Integer.parseInt(args[2]));
 							clock.enableCountdown(true);
-							if(Main.INSTANCE.clockTasks.containsKey(args[1])) {
-								Main.INSTANCE.getServer().getScheduler().cancelTask(Main.INSTANCE.clockTasks.get(args[1]));
-								Main.INSTANCE.clockTasks.remove(args[1]);
+							if(Main.i.clockTasks.containsKey(args[1])) {
+								Main.i.getServer().getScheduler().cancelTask(Main.i.clockTasks.get(args[1]));
+								Main.i.clockTasks.remove(args[1]);
 							}
 							String hours = Generator.getCountdownNumbers(clock.getCountdownTime())[0];
 							String minutes = Generator.getCountdownNumbers(clock.getCountdownTime())[1];
 							String seconds = Generator.getCountdownNumbers(clock.getCountdownTime())[2];
-							Generator.generatingSequence(clock, hours, minutes, seconds);
-							player.sendMessage(ChatColor.GREEN + "[DigitalClock] You have successfully set countdown time on clock '" + args[1] + "' to "+ hours +":"+ minutes +":"+ seconds +". Main.INSTANCE clock is now stopped, run it by command '/digitalclock runclock <name>'.");
+							Generator.generatingSequence(clock, hours, minutes, seconds, null);
+							player.sendMessage(ChatColor.GREEN + "[DigitalClock] You have successfully set countdown time on clock '" + args[1] + "' to "+ hours +":"+ minutes +":"+ seconds +". Main.i clock is now stopped, run it by command '/digitalclock runclock <name>'.");
 						}
 					} else if(args[0].equals("disablecountdown")) { // 16
 						if(args.length != 2) {
 							player.sendMessage(ChatColor.RED + "[DigitalClock] Correct usage: '/digitalclock disablecountdown <name>'");
 						} else if(!player.hasPermission("digitalclock.disablecountdown") && !player.isOp()) {
-							player.sendMessage(ChatColor.RED + "[DigitalClock] You aren't allowed to use Main.INSTANCE command!");
-						} else if(!Main.INSTANCE.getConfig().getKeys(false).contains(args[1])) {
+							player.sendMessage(ChatColor.RED + "[DigitalClock] You aren't allowed to use this command!");
+						} else if(!Main.i.clocksConf.getKeys(false).contains(args[1])) {
 							player.sendMessage(ChatColor.RED + "[DigitalClock] Clock '" + args[1] + "' not found!");
 						} else if(!Clock.loadClockByClockName(args[1]).isCountdownEnabled()) {
 							player.sendMessage(ChatColor.RED + "[DigitalClock] Clock '" + args[1] + "' hasn't enabled countdown mode!");
 						} else {
 							Clock clock = Clock.loadClockByClockName(args[1]);
 							clock.enableCountdown(false);
-							if(Main.INSTANCE.clockTasks.containsKey(args[1])) {
-								Main.INSTANCE.getServer().getScheduler().cancelTask(Main.INSTANCE.clockTasks.get(args[1]));
-								Main.INSTANCE.clockTasks.remove(args[1]);
+							if(Main.i.clockTasks.containsKey(args[1])) {
+								Main.i.getServer().getScheduler().cancelTask(Main.i.clockTasks.get(args[1]));
+								Main.i.clockTasks.remove(args[1]);
 							}
-							String hours = Generator.getRealNumbers(clock.getAddMinutes())[0];
-							String minutes = Generator.getRealNumbers(clock.getAddMinutes())[1];
-							String seconds = Generator.getRealNumbers(clock.getAddMinutes())[2];
-							Generator.generatingSequence(clock, hours, minutes, seconds);
-							player.sendMessage(ChatColor.GREEN + "[DigitalClock] You have successfully disabled countdown mode on clock '" + args[1] + "'. Main.INSTANCE clock is now stopped, run it by command '/digitalclock runclock <name>'.");
+							String hours = Generator.getRealNumbers(clock.getAddMinutes(), null)[0];
+							String minutes = Generator.getRealNumbers(clock.getAddMinutes(), null)[1];
+							String seconds = Generator.getRealNumbers(clock.getAddMinutes(), null)[2];
+							Generator.generatingSequence(clock, hours, minutes, seconds, null);
+							player.sendMessage(ChatColor.GREEN + "[DigitalClock] You have successfully disabled countdown mode on clock '" + args[1] + "'. Main.i clock is now stopped, run it by command '/digitalclock runclock <name>'.");
 						}
 					} else if(args[0].equals("list")) { // 17
 						if(args.length != 1) {
 							player.sendMessage(ChatColor.RED + "[DigitalClock] Correct usage: '/digitalclock list'");
 						} else if(!player.hasPermission("digitalclock.list") && !player.isOp()) {
-							player.sendMessage(ChatColor.RED + "[DigitalClock] You aren't allowed to use Main.INSTANCE command!");
+							player.sendMessage(ChatColor.RED + "[DigitalClock] You aren't allowed to use this command!");
 						} else {	
 							player.sendMessage(ChatColor.GREEN + "[DigitalClock] List of all existing clocks:");
 							String list = "";
 							int i = 0;
-							if(Main.INSTANCE.clocks.size() != 0) {
-								for(String name : Main.INSTANCE.clocks) {
+							if(Main.i.clocks.size() != 0) {
+								for(String name : Main.i.clocks) {
 									Clock clock = Clock.loadClockByClockName(name);
 									list += clock.getName();
-									if(i != Main.INSTANCE.clocks.size()-1) {
+									if(i != Main.i.clocks.size()-1) {
 										list += ", ";
 									}
 									i++;
@@ -311,16 +311,46 @@ public class Commands implements CommandExecutor {
 						if(args.length != 1) {
 							player.sendMessage(ChatColor.RED + "[DigitalClock] Correct usage: '/digitalclock reload'");
 						} else if(!player.hasPermission("digitalclock.reload") && !player.isOp()) {
-							player.sendMessage(ChatColor.RED + "[DigitalClock] You aren't allowed to use Main.INSTANCE command!");
+							player.sendMessage(ChatColor.RED + "[DigitalClock] You aren't allowed to use this command!");
 						} else {	
-							Main.INSTANCE.reloadSettings();
-							player.sendMessage(ChatColor.GREEN + "[DigitalClock] File settings.yml has been reloaded!");
+							Main.i.reloadConf();
+							player.sendMessage(ChatColor.GREEN + "[DigitalClock] File config.yml has been reloaded!");
 						}
-					} else if(args[0].equals("help") || args[0].equals("?")) { // 19
+					} else if(args[0].equals("settime")) { // 19
+						if(args.length != 3) {
+							player.sendMessage(ChatColor.RED + "[DigitalClock] Correct usage: '/digitalclock settime <name> <HH:MM>'");
+						} else if(!player.hasPermission("digitalclock.settime") && !player.isOp()) {
+							player.sendMessage(ChatColor.RED + "[DigitalClock] You aren't allowed to use this command!");
+						} else if(!Main.i.clocksConf.getKeys(false).contains(args[1])) {
+							player.sendMessage(ChatColor.RED + "[DigitalClock] Clock '" + args[1] + "' not found!");
+						} else {
+							String input = args[2];
+							if(input.length() == 5 
+									&& Character.isDigit(input.charAt(0))
+									&& Character.isDigit(input.charAt(1))
+									&& Character.isDigit(input.charAt(3))
+									&& Character.isDigit(input.charAt(4))
+									&& input.charAt(2) == ':') {
+								int hours = Integer.parseInt(Character.toString(input.charAt(0)))*10 + Integer.parseInt(Character.toString(input.charAt(1)));
+								int mins = Integer.parseInt(Character.toString(input.charAt(3)))*10 + Integer.parseInt(Character.toString(input.charAt(4)));
+								if(hours >= 0 && hours < 24 && mins >= 0 && mins < 60) {
+									Clock clock = Clock.loadClockByClockName(args[1]);
+									int currentTimeInMinutes = Integer.parseInt(Generator.getRealNumbers(0, null)[0])*60 + Integer.parseInt(Generator.getRealNumbers(0, null)[1]);
+									int newAddingMinutes = (currentTimeInMinutes - hours*60 - mins)*-1;
+									clock.addMinutes(newAddingMinutes);
+									player.sendMessage(ChatColor.GREEN + "[DigitalClock] Time on clock '" + args[1] + " is now "+ input +". To set the time back to real time just use command '/digitalclock addingminutes "+ args[1] +" 0'.");
+								} else {
+									player.sendMessage(ChatColor.RED + "[DigitalClock] HH must be integer from 00 to 23 and MM must be integer from 00 to 59!");
+								}
+							} else {
+								player.sendMessage(ChatColor.RED + "[DigitalClock] Time has incorrect format, it has to be HH:MM!");
+							}
+						}		
+					} else if(args[0].equals("help") || args[0].equals("?")) { // 20
 						if(args.length != 1) {
 							player.sendMessage(ChatColor.RED + "[DigitalClock] Correct usage: '/digitalclock help'");
 						} else if(!player.hasPermission("digitalclock.help") && !player.isOp()) {
-							player.sendMessage(ChatColor.RED + "[DigitalClock] You aren't allowed to use Main.INSTANCE command!");
+							player.sendMessage(ChatColor.RED + "[DigitalClock] You aren't allowed to use this command!");
 						} else {	
 							player.sendMessage(ChatColor.GREEN + "[DigitalClock] All possible arguments:");
 							player.sendMessage(ChatColor.GREEN + "/digitalclock " + 
@@ -330,6 +360,7 @@ public class Commands implements CommandExecutor {
 									ChatColor.DARK_GREEN + "material" + ChatColor.GREEN + ", " + 
 									ChatColor.DARK_GREEN + "fill" + ChatColor.GREEN + ", " + 
 									ChatColor.DARK_GREEN + "addingminutes" + ChatColor.GREEN + ", " + 
+									ChatColor.DARK_GREEN + "settime" + ChatColor.GREEN + ", " +
 									ChatColor.DARK_GREEN + "move" + ChatColor.GREEN + ", " + 
 									ChatColor.DARK_GREEN + "setcountdown" + ChatColor.GREEN + ", " + 
 									ChatColor.DARK_GREEN + "disablecountdown" + ChatColor.GREEN + ", " + 
@@ -345,13 +376,13 @@ public class Commands implements CommandExecutor {
 									ChatColor.DARK_GREEN + "help" + ChatColor.GREEN + ".\nYou can find more information on\n" + ChatColor.BLUE + "http://dev.bukkit.org/server-mods/digitalclock");
 						}
 			    	} else {
-			    		player.sendMessage(ChatColor.RED + "[DigitalClock] Main.INSTANCE argument doesn't exist. Show '/digitalclock help' for more info.");
+			    		player.sendMessage(ChatColor.RED + "[DigitalClock] This argument doesn't exist. Show '/digitalclock help' for more info.");
 			    	}
         		} else {
-    				sender.sendMessage(ChatColor.RED + "[DigitalClock] Main.INSTANCE command can be executed only from the game!");
+    				sender.sendMessage(ChatColor.RED + "[DigitalClock] This command can be executed only from the game!");
         		}
 			} else {
-				sender.sendMessage(ChatColor.GREEN + "---- DigitalClock v"+ Main.INSTANCE.getDescription().getVersion() +" ----\nAuthor: PerwinCZ\nRun command '/digitalclock help' in game for commands list.");
+				sender.sendMessage(ChatColor.GREEN + "---- DigitalClock v"+ Main.i.getDescription().getVersion() +" ----\nAuthor: PerwinCZ\nRun command '/digitalclock help' in game for commands list.");
 			}
 			return true;
 		} 

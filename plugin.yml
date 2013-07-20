@@ -1,7 +1,7 @@
 name: DigitalClock
 main: me.PerwinCZ.DigitalClock.Main
 author: PerwinCZ
-version: 1.4
+version: 1.6
 commands:
   digitalclock:
     description: Use more arguments for this command
@@ -28,7 +28,7 @@ permissions:
   digitalclock.list:
     description: Allows you to show the list of existing clocks   
   digitalclock.reload:
-    description: Allows you to reload settings.yml file   
+    description: Allows you to reload config.yml file   
   digitalclock.help:
     description: Allows you to show the plugin command helper
   digitalclock.limit.*:
@@ -38,13 +38,19 @@ permissions:
   digitalclock.toggleampm:
     description: Allows you to toggle showing AM/PM 
   digitalclock.toggleseconds:
-    description: Allows you to toggle showing seconds 
+    description: Allows you to toggle showing seconds    
+  digitalclock.toggleingametime:
+    description: Allows you to toggle showing of ingame time
+  digitalclock.settime:
+    description: Allows you to set time on specified clock
   digitalclock.toggleblinking:
     description: Allows you to toggle blinking of colon (:)
   digitalclock.setcountdown:
     description: Allows you to set countdown on clock
   digitalclock.disablecountdown:
-    description: Allows you to disable countdown mode on clock    
+    description: Allows you to disable countdown mode on clock   
+  digitalclock.toggleingametime:
+    description: Toggles showing of world (ingame) time   
     
     
                  
