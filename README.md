@@ -3,6 +3,8 @@ DigitalClock
 
 DigitalClock is a CraftBukkit plugin, which allows you to create self-updating digital clock.
 
+![DigitalClock in-game look](http://dev.bukkit.org/media/images/66/435/digitalclock_example2.png)
+
 Features
 --------
 
@@ -17,6 +19,7 @@ Features
 * Always new version for the newest CB
 * Public API for creating addons and public plugin source
 * When problem occurs, it is easy to PM me (author of this plugin) and I am always willing to help :)
+
 and much much more...
 
 More information
