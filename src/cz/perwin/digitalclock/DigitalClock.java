@@ -13,28 +13,36 @@ import java.util.Map;
 import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
 
-import cz.perwin.digitalclock.mcstats.Metrics;
-
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
-public class Main extends JavaPlugin {
+import cz.perwin.digitalclock.core.Clock;
+import cz.perwin.digitalclock.core.Commands;
+import cz.perwin.digitalclock.core.Events;
+import cz.perwin.digitalclock.core.Generator;
+import cz.perwin.digitalclock.utils.Metrics;
+
+public class DigitalClock extends JavaPlugin {
     private Map<Player, String> enableBuildUsers = new HashMap<Player, String>();
     private Map<Player, String> enableMoveUsers = new HashMap<Player, String>();
     private Map<String, Integer> usersClock = new HashMap<String, Integer>();
 	private ArrayList<String> clocks = new ArrayList<String>();
-	protected final Logger console = Logger.getLogger("Minecraft");
+	private final Logger console = Logger.getLogger("Minecraft");
 	private Map<String, Integer> clockTasks = new HashMap<String, Integer>();
 	private FileConfiguration clocksConf = null;
 	private File clocksFile = null;
-	protected int settings_width;
-	protected boolean separately;
+	private int settings_width = 0;
+	private boolean separately;
+	private boolean shouldRun;
+	private boolean versionWarning;
+	private boolean protectClocks;
+	private long generatorAccuracy = 0;
 	private Generator generator;
 	
 	static {
-		System.out.println("[DigitalClock] Preparing DigitalClock for loading... :)");
+		System.out.println("[DigitalClock] Preparing DigitalClock for loading...");
 		File pluginDir = new File("plugins/DigitalClock");
 		if(!pluginDir.exists()) {
 			pluginDir.mkdir();
@@ -64,15 +72,13 @@ public class Main extends JavaPlugin {
 	
 	public void onEnable() {
 		this.console.info("[DigitalClock] Plugin has been enabled!");
+		Version.check(this.getDescription().getVersion());
 		
 		// PREPARING SERVER
-		Clock.i = this;
 		this.saveDefaultConfig();
-		this.reloadConfig();
+		this.reloadConf();
 		this.saveDefaultClocksConf();
 		this.reloadClocksConf();
-		Main.this.settings_width = this.getConfig().getInt("width");
-		Main.this.separately = this.getConfig().getBoolean("generateForEachPlayerSeparately");
 		this.generator = new Generator(this);
 		
 		// LOADING CLASSES
@@ -101,30 +107,23 @@ public class Main extends JavaPlugin {
 	protected void runTasks() {
 		this.getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
 			public void run() {
-				Main.this.saveClocksConf();
+				DigitalClock.this.saveClocksConf();
 			}
 		}, 20L, (15*60*20));
 		
 		for(final String name : getClocksL()) {
-			int task = this.getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
-				public void run() {
-						Clock clock = Clock.loadClockByClockName(name);
-						if(Main.this.getClocksConf().getKeys(false).contains(clock.getName())) {
-					    	Main.this.getGenerator().start(clock);
-						}
-				}
-			}, 0L, 20L);
-			this.getClockTasks().put(name, task);
+			this.run(name);
 		}
 	}
 	
-	public void runClock(final String name) {
+	public void run(final String name) {
 		if(!this.getClockTasks().containsKey(name)) {
-			int task = this.getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
+			int task = this.getServer().getScheduler().scheduleSyncRepeatingTask(Generator.getGenerator().getMain(), new Runnable() {
 				public void run() {
 						Clock clock = Clock.loadClockByClockName(name);
-						if(Main.this.getClocksConf().getKeys(false).contains(clock.getName())) {
-					    	Main.this.getGenerator().start(clock);
+						clock.reloadFromConfig();
+						if(DigitalClock.this.getClocksConf().getKeys(false).contains(clock.getName())) {
+							Generator.getGenerator().generateOnce(clock);
 						}
 				}
 			}, 0L, 20L);
@@ -134,15 +133,20 @@ public class Main extends JavaPlugin {
 	
 	public void reloadConf() {
 		this.reloadConfig();
-		Main.this.settings_width = this.getConfig().getInt("width");
-		Main.this.separately = this.getConfig().getBoolean("generateForEachPlayerSeparately");
+		DigitalClock.this.settings_width = this.getConfig().getInt("width", 3);
+		DigitalClock.this.separately = this.getConfig().getBoolean("generateForEachPlayerSeparately", false);
+		DigitalClock.this.shouldRun = this.getConfig().getBoolean("runAfterCreation", false);
+		DigitalClock.this.versionWarning = this.getConfig().getBoolean("enableNewerVersionWarning", true);
+		DigitalClock.this.protectClocks = this.getConfig().getBoolean("protectClocks", false);
+		DigitalClock.this.generatorAccuracy = this.getConfig().getLong("generatorAccuracy", 2000L);
 	}
 	
 	public void reloadClocksConf() {
 	    setClocksConf(YamlConfiguration.loadConfiguration(clocksFile));
 	    InputStream defConfigStream = this.getResource("clocks.yml");
 	    if(defConfigStream != null) {
-	        YamlConfiguration defConfig = YamlConfiguration.loadConfiguration(defConfigStream);
+	        @SuppressWarnings("deprecation")
+			YamlConfiguration defConfig = YamlConfiguration.loadConfiguration(defConfigStream);
 	        getClocksConf().setDefaults(defConfig);
 	    }
 	}
@@ -161,7 +165,7 @@ public class Main extends JavaPlugin {
 	    return;
 	    }
 	    try {
-	        Main.this.getClocksConf().save(clocksFile);
+	        DigitalClock.this.getClocksConf().save(clocksFile);
 	    } catch (IOException ex) {
 	        this.console.severe(ex + "");
 	    }
@@ -170,7 +174,7 @@ public class Main extends JavaPlugin {
 	public void getClocks() {
 		this.getClocksL().clear();
 		this.getUsersClock().clear();
-		for(String name : Main.this.getClocksConf().getKeys(false)) {
+		for(String name : DigitalClock.this.getClocksConf().getKeys(false)) {
 			Clock clock = Clock.loadClockByClockName(name);
 			if(this.getUsersClock().containsKey(clock.getCreator())) {
 				int n = this.getUsersClock().get(clock.getCreator());
@@ -233,5 +237,37 @@ public class Main extends JavaPlugin {
 
 	public void setClocksL(ArrayList<String> clocks) {
 		this.clocks = clocks;
+	}
+	
+	public String getMessagePrefix() {
+		return "[DigitalClock]";
+	}
+	
+	public Logger getConsole() {
+		return this.console;
+	}
+	
+	public int getSettingsWidth() {
+		return this.settings_width;
+	}
+	
+	public boolean shouldRun() {
+		return this.shouldRun;
+	}
+
+	public boolean versionWarning() {
+		return this.versionWarning;
+	}
+	
+	public boolean protectClocks() {
+		return this.protectClocks;
+	}
+	
+	public boolean shouldGenerateSeparately() {
+		return this.separately;
+	}
+	
+	public long getGeneratorAccuracy() {
+		return this.generatorAccuracy;
 	}
 }

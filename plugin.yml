@@ -1,11 +1,14 @@
 name: DigitalClock
-main: me.PerwinCZ.DigitalClock.Main
+main: cz.perwin.digitalclock.DigitalClock
 author: PerwinCZ
-version: 1.6
+version: 1.8
 commands:
   digitalclock:
     description: Use more arguments for this command
-    usage: /digitalclock (arguments)
+    usage: /digitalclock (arguments)  
+  dc:
+    description: Alias of /digitalclock
+    usage: /dc (arguments)
 permissions:
   digitalclock.create:
     description: Allows you to create a new clock 
@@ -13,9 +16,9 @@ permissions:
     description: Allows you to remove an existing clock 
   digitalclock.rotate:
     description: Allows you to rotate an existing clock 
-  digitalclock.material:
+  digitalclock.material.*:
     description: Allows you to change the material of an existing clock 
-  digitalclock.fill:
+  digitalclock.fill.*:
     description: Allows you to change the filling material of an existing clock 
   digitalclock.move:
     description: Allows you to move an existing clock to the clicked coords
@@ -32,7 +35,7 @@ permissions:
   digitalclock.help:
     description: Allows you to show the plugin command helper
   digitalclock.limit.*:
-    description: Sets the limit of clock for player 
+    description: Sets the limit of clocks per player 
   digitalclock.addingminutes:
     description: Allows you to add minutes on your clock  
   digitalclock.toggleampm:
@@ -50,7 +53,9 @@ permissions:
   digitalclock.disablecountdown:
     description: Allows you to disable countdown mode on clock   
   digitalclock.toggleingametime:
-    description: Toggles showing of world (ingame) time   
+    description: Allows you to toggle showing of world (ingame) time   
+  digitalclock.update:
+    description: Allows you to update plugin to a newer version
     
     
                  

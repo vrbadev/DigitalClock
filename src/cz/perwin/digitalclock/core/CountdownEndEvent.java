@@ -1,4 +1,4 @@
-package cz.perwin.digitalclock;
+package cz.perwin.digitalclock.core;
 
 import java.util.Date;
 

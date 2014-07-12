@@ -1,21 +1,23 @@
-package cz.perwin.digitalclock;
+package cz.perwin.digitalclock.core;
 
 import org.bukkit.entity.Player;
 
+import cz.perwin.digitalclock.DigitalClock;
+
 public class CommandInfo {
-	private Main i;
+	private DigitalClock i;
 	private Player player;
 	private String[] args;
 	private String usedcmd;
 	
-	protected CommandInfo(Main i, Player player, String[] args, String usedcmd) {
+	protected CommandInfo(DigitalClock i, Player player, String[] args, String usedcmd) {
 		this.i = i;
 		this.player = player;
 		this.args = args;
 		this.usedcmd = usedcmd;
 	}
 	
-	public Main getMain() {
+	public DigitalClock getMain() {
 		return this.i;
 	}
 	

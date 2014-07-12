@@ -1,4 +1,8 @@
+enableNewerVersionWarning: true
+runAfterCreation: false
+generatorAccuracy: 2000 #in milliseconds
 generateForEachPlayerSeparately: false
+protectClocks: false
 checkUpdateInDaysEvery: 7
 height: 5
 width: 3

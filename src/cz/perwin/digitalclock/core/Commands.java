@@ -1,4 +1,4 @@
-package cz.perwin.digitalclock;
+package cz.perwin.digitalclock.core;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -6,6 +6,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import cz.perwin.digitalclock.DigitalClock;
 import cz.perwin.digitalclock.commands.CommandAddingminutes;
 import cz.perwin.digitalclock.commands.CommandCreate;
 import cz.perwin.digitalclock.commands.CommandDisablecountdown;
@@ -26,11 +27,12 @@ import cz.perwin.digitalclock.commands.CommandToggleampm;
 import cz.perwin.digitalclock.commands.CommandToggleblinking;
 import cz.perwin.digitalclock.commands.CommandToggleingametime;
 import cz.perwin.digitalclock.commands.CommandToggleseconds;
+import cz.perwin.digitalclock.commands.CommandUpdate;
 
 public class Commands implements CommandExecutor {
-	private Main i;
+	private DigitalClock i;
 	
-	public Commands(Main i) {
+	public Commands(DigitalClock i) {
 		this.i = i;
 	}
 	
@@ -77,22 +79,26 @@ public class Commands implements CommandExecutor {
 						new CommandDisablecountdown(info);
 					} else if(args[0].equalsIgnoreCase("list")) { // 17
 						new CommandList(info);
-					} else if(args[0].equalsIgnoreCase("reload")) { // 18�
+					} else if(args[0].equalsIgnoreCase("reload")) { // 18
 						new CommandReload(info, sender);
 					} else if(args[0].equalsIgnoreCase("settime")) { // 19
 						new CommandSettime(info);
-					} else if(args[0].equalsIgnoreCase("help") || args[0].equalsIgnoreCase("?")) { // 20
+					} else if(args[0].equalsIgnoreCase("update")) { // 20
+						new CommandUpdate(info, sender);
+					} else if(args[0].equalsIgnoreCase("help") || args[0].equalsIgnoreCase("?")) { // 21
 						new CommandHelp(info);
 			    	} else {
-			    		player.sendMessage(ChatColor.RED + "[DigitalClock] This argument doesn't exist. Show '/"+ usedcmd + " help' for more info.");
+			    		player.sendMessage(ChatColor.DARK_RED + this.i.getMessagePrefix() + ChatColor.RED + " This argument doesn't exist. Show '/"+ usedcmd + " help' for more info.");
 			    	}
         		} else {
-        			// TODO opraveno v 1.7, drive neslo volat /dc reload z konzole
         			if(args[0].equalsIgnoreCase("reload")) { // 18
     					CommandInfo info = new CommandInfo(this.i, null, args, usedcmd);
 						new CommandReload(info, sender);
+        			} else if(args[0].equalsIgnoreCase("update")) { // 20
+    					CommandInfo info = new CommandInfo(this.i, null, args, usedcmd);
+						new CommandUpdate(info, sender);
         			} else {
-        				sender.sendMessage(ChatColor.RED + "[DigitalClock] This command can be executed only from the game!");
+        				sender.sendMessage(ChatColor.DARK_RED + this.i.getMessagePrefix() + ChatColor.RED + " This command can be executed only from the game!");
         			}
         		}
 			} else {
