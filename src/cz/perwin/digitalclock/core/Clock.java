@@ -23,6 +23,7 @@ public class Clock {
 	private int countdownto;
 	private ClockMode clockMode;
 	private ClockArea clockArea;
+	private int stopwatchtime;
 	
 	@SuppressWarnings("deprecation")
 	public Clock(String name, String playerName, Block block, Block playersBlock) {
@@ -65,6 +66,7 @@ public class Clock {
 			Generator.getGenerator().getMain().getClocksConf().set(this.clockName + ".changer", this.blinkingChanger);
 			Generator.getGenerator().getMain().getClocksConf().set(this.clockName + ".ampm", this.ampm);
 			Generator.getGenerator().getMain().getClocksConf().set(this.clockName + ".cdt", this.countdownto);
+			Generator.getGenerator().getMain().getClocksConf().set(this.clockName + ".swt", this.stopwatchtime);
 			Generator.getGenerator().getMain().getClocksConf().set(this.clockName + ".mode", this.clockMode.name());
 			//Generator.getGenerator().getMain().saveConfig();
 		} else {
@@ -105,9 +107,11 @@ public class Clock {
 		return this.fillingMaterial;
 	}
 	
-	public static void stopTask(String clockName) {
-		Generator.getGenerator().getMain().getServer().getScheduler().cancelTask(Generator.getGenerator().getMain().getClockTasks().get(clockName));
+	public static int stopTask(String clockName) {
+		int task = Generator.getGenerator().getMain().getClockTasks().get(clockName);
+		Generator.getGenerator().getMain().getServer().getScheduler().cancelTask(task);
 		Generator.getGenerator().getMain().getClockTasks().remove(clockName);
+		return task;
 	}
 
 	public static void eraseCompletely(Clock clock) {
@@ -144,6 +148,7 @@ public class Clock {
         	this.blinkingChanger = Boolean.parseBoolean(Generator.getGenerator().getMain().getClocksConf().getString(this.clockName + ".changer"));
         	this.ampm = Boolean.parseBoolean(Generator.getGenerator().getMain().getClocksConf().getString(this.clockName + ".ampm"));
         	this.countdownto = Generator.getGenerator().getMain().getClocksConf().getInt(this.clockName + ".cdt");
+        	this.stopwatchtime = Generator.getGenerator().getMain().getClocksConf().getInt(this.clockName + ".swt");
         	this.clockMode = ClockMode.valueOf(Generator.getGenerator().getMain().getClocksConf().getString(this.clockName + ".mode", "NORMAL"));
         }
     }
@@ -167,6 +172,12 @@ public class Clock {
 		this.write();
 	}
 	
+	public void enableStopwatch(boolean s) {
+		this.reloadFromConfig();
+		this.clockMode = s ? ClockMode.STOPWATCH : ClockMode.NORMAL;
+		this.write();
+	}
+	
 	public int getCountdownTime() {
 		this.reloadFromConfig();
 		return this.countdownto;
@@ -175,6 +186,17 @@ public class Clock {
 	public void setCountdownTime(int t) {
 		this.reloadFromConfig();
 		this.countdownto = t;
+		this.write();
+	}
+	
+	public int getStopwatchTime() {
+		this.reloadFromConfig();
+		return this.stopwatchtime;
+	}
+	
+	public void setStopwatchTime(int t) {
+		this.reloadFromConfig();
+		this.stopwatchtime = t;
 		this.write();
 	}
 	

@@ -1,3 +1,4 @@
+enableVersionOnStartChecking: true
 enableNewerVersionWarning: true
 runAfterCreation: false
 generatorAccuracy: 2000 #in milliseconds

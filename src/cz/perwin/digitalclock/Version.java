@@ -47,12 +47,12 @@ public class Version {
 	
 	public static void update(final CommandSender sender, final String prefix, String currentVersion, final String pluginName) {
 		if(Version.updatingThread != null) {
-			sender.sendMessage(ChatColor.DARK_GREEN + prefix + ChatColor.GREEN +" Plugin is currently updating");
+			sendMessage(sender, ChatColor.DARK_GREEN + prefix + ChatColor.GREEN +" Plugin is currently updating");
 		} else {
 			if(Version.getActualVersion().getVersion().equals(currentVersion)) {
-				sender.sendMessage(ChatColor.DARK_RED + prefix + ChatColor.RED +" Your version is actual so it can't be updated");
+				sendMessage(sender, ChatColor.DARK_RED + prefix + ChatColor.RED +" Your version is actual so it can't be updated");
 			} else {
-				sender.sendMessage(ChatColor.DARK_GREEN + prefix + ChatColor.GREEN +" Updating process started, please wait until it finishes");
+				sendMessage(sender, ChatColor.DARK_GREEN + prefix + ChatColor.GREEN +" Updating process started, please wait until it finishes");
 				
 				Version.updatingThread = new Thread(new Runnable() {
 					@Override
@@ -80,12 +80,20 @@ public class Version {
 					
 					private void sendMessage(String msg) {
 						if(!(sender instanceof Player && !((Player) sender).isOnline())) {
-							sender.sendMessage(msg);
+							Version.sendMessage(sender, msg);
 						}
 					}
 				});
 				Version.updatingThread.start();
 			}
+		}
+	}
+	
+	public static void sendMessage(CommandSender sender, String message) {
+		if(sender == null) {
+			System.out.println(message);
+		} else {
+			sender.sendMessage(message);
 		}
 	}
 }

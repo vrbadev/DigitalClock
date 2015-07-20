@@ -1,5 +1,5 @@
 package cz.perwin.digitalclock.core;
 
 public enum ClockMode {
-	NORMAL, COUNTDOWN, INGAMETIME;
+	NORMAL, COUNTDOWN, INGAMETIME, STOPWATCH;
 }

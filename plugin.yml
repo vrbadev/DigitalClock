@@ -1,7 +1,7 @@
 name: DigitalClock
 main: cz.perwin.digitalclock.DigitalClock
 author: PerwinCZ
-version: 1.8
+version: 1.9
 commands:
   digitalclock:
     description: Use more arguments for this command
@@ -49,9 +49,13 @@ permissions:
   digitalclock.toggleblinking:
     description: Allows you to toggle blinking of colon (:)
   digitalclock.setcountdown:
-    description: Allows you to set countdown on clock
+    description: Allows you to set countdown mode on clock 
   digitalclock.disablecountdown:
     description: Allows you to disable countdown mode on clock   
+  digitalclock.setstopwatch:
+    description: Allows you to set stopwatch mode on clock
+  digitalclock.disablestopwatch:
+    description: Allows you to disable stopwatch mode on clock
   digitalclock.toggleingametime:
     description: Allows you to toggle showing of world (ingame) time   
   digitalclock.update:

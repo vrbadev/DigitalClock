@@ -1,23 +1,60 @@
 package cz.perwin.digitalclock.commands;
 
 import org.bukkit.ChatColor;
+import org.bukkit.entity.Player;
 
-import cz.perwin.digitalclock.core.CommandInfo;
+import cz.perwin.digitalclock.DigitalClock;
 
-public class CommandMove {
-	public CommandMove(CommandInfo info) {
-		if(info.getArgs().length != 2) {
-			info.getPlayer().sendMessage(ChatColor.DARK_RED + info.getMain().getMessagePrefix() + ChatColor.RED + " Correct usage: '/"+ info.getUsedcmd() + " move <name>'");
-		} else if(!info.getPlayer().hasPermission("digitalclock.move") && !info.getPlayer().isOp()) {
-			info.getPlayer().sendMessage(ChatColor.DARK_RED + info.getMain().getMessagePrefix() + ChatColor.RED + " You aren't allowed to use this command!");
-		} else if(!info.getMain().getClocksConf().getKeys(false).contains(info.getArgs()[1])) {
-			info.getPlayer().sendMessage(ChatColor.DARK_RED + info.getMain().getMessagePrefix() + ChatColor.RED + " Clock '" + info.getArgs()[1] + "' not found!");
-		} else if(info.getMain().getEnableMoveUsers().containsKey(info.getPlayer())) {
-			info.getPlayer().sendMessage(ChatColor.DARK_GREEN + info.getMain().getMessagePrefix() + ChatColor.GREEN + " Moving clock '" + info.getArgs()[1] + "' has been rejected!");
-			info.getMain().getEnableMoveUsers().remove(info.getPlayer());
-		} else {	
-			info.getMain().getEnableMoveUsers().put(info.getPlayer(), info.getArgs()[1]);
-			info.getPlayer().sendMessage(ChatColor.DARK_GREEN + info.getMain().getMessagePrefix() + ChatColor.GREEN + " Moving clock '" + info.getArgs()[1] + "' has been enabled. Now just right click to some place to move your clock there.");
-		}
+public class CommandMove implements ICommand {
+	@Override
+	public int getArgsSize() {
+		return 2;
+	}
+
+	@Override
+	public String getPermissionName() {
+		return "digitalclock.move";
+	}
+
+	@Override
+	public boolean specialCondition(DigitalClock main, Player player, String[] args) {
+		return main.getEnableMoveUsers().containsKey(player);
+	}
+
+	@Override
+	public boolean checkClockExistence() {
+		return true;
+	}
+
+	@Override
+	public boolean neededClockExistenceValue() {
+		return true;
+	}
+
+	@Override
+	public String reactBadArgsSize(String usedCmd) {
+		return ChatColor.DARK_RED + DigitalClock.getMessagePrefix() + ChatColor.RED + " Correct usage: '/" + usedCmd + " move <name>'";
+	}
+
+	@Override
+	public String reactNoPermissions() {
+		return ChatColor.DARK_RED + DigitalClock.getMessagePrefix() + ChatColor.RED + " You aren't allowed to use this command!";
+	}
+
+	@Override
+	public void specialConditionProcess(DigitalClock main, Player player, String[] args) {
+		main.getEnableMoveUsers().remove(player);
+		player.sendMessage(ChatColor.DARK_GREEN + DigitalClock.getMessagePrefix() + ChatColor.GREEN + " Moving this clock has been rejected!");
+	}
+
+	@Override
+	public String reactBadClockList(String clockName) {
+		return ChatColor.DARK_RED + DigitalClock.getMessagePrefix() + ChatColor.RED + " Clock '" + clockName + "' not found!";
+	}
+
+	@Override
+	public void process(DigitalClock main, Player player, String[] args) {
+		main.getEnableMoveUsers().put(player, args[1]);
+		player.sendMessage(ChatColor.DARK_GREEN + DigitalClock.getMessagePrefix() + ChatColor.GREEN + " Moving clock '" + args[1] + "' has been enabled. Now just right click to some place to move your clock there.");
 	}
 }

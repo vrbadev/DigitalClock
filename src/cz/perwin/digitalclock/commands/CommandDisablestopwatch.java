@@ -6,8 +6,9 @@ import org.bukkit.entity.Player;
 import cz.perwin.digitalclock.DigitalClock;
 import cz.perwin.digitalclock.core.Clock;
 import cz.perwin.digitalclock.core.ClockMode;
+import cz.perwin.digitalclock.core.StopwatchEndEvent;
 
-public class CommandDisablecountdown implements ICommand {
+public class CommandDisablestopwatch implements ICommand {
 	@Override
 	public int getArgsSize() {
 		return 2;
@@ -15,12 +16,12 @@ public class CommandDisablecountdown implements ICommand {
 
 	@Override
 	public String getPermissionName() {
-		return "digitalclock.disablecountdown";
+		return "digitalclock.disablestopwatch";
 	}
 
 	@Override
 	public boolean specialCondition(DigitalClock main, Player player, String[] args) {
-		return Clock.loadClockByClockName(args[1]).getClockMode() != ClockMode.COUNTDOWN;
+		return Clock.loadClockByClockName(args[1]).getClockMode() != ClockMode.STOPWATCH;
 	}
 
 	@Override
@@ -35,7 +36,7 @@ public class CommandDisablecountdown implements ICommand {
 
 	@Override
 	public String reactBadArgsSize(String usedCmd) {
-		return ChatColor.DARK_RED + DigitalClock.getMessagePrefix() + ChatColor.RED + " Correct usage: '/"+ usedCmd + " disablecountdown <name>'";
+		return ChatColor.DARK_RED + DigitalClock.getMessagePrefix() + ChatColor.RED + " Correct usage: '/"+ usedCmd + " disablestopwatch <name>'";
 	}
 
 	@Override
@@ -45,7 +46,7 @@ public class CommandDisablecountdown implements ICommand {
 
 	@Override
 	public void specialConditionProcess(DigitalClock main, Player player, String[] args) {
-		player.sendMessage(ChatColor.DARK_RED + DigitalClock.getMessagePrefix() + ChatColor.RED + " This clock hasn't enabled countdown mode!");
+		player.sendMessage(ChatColor.DARK_RED + DigitalClock.getMessagePrefix() + ChatColor.RED + " This clock hasn't enabled stopwatch mode!");
 	}
 
 	@Override
@@ -56,7 +57,8 @@ public class CommandDisablecountdown implements ICommand {
 	@Override
 	public void process(DigitalClock main, Player player, String[] args) {
 		Clock clock = Clock.loadClockByClockName(args[1]);
-		clock.enableCountdown(false);
+		clock.enableStopwatch(false);
+		main.getServer().getPluginManager().callEvent(new StopwatchEndEvent(clock, clock.getStopwatchTime()));
 		if(main.getClockTasks().containsKey(args[1])) {
 			main.getServer().getScheduler().cancelTask(main.getClockTasks().get(args[1]));
 			main.getClockTasks().remove(args[1]);
@@ -65,6 +67,6 @@ public class CommandDisablecountdown implements ICommand {
 		String minutes = main.getGenerator().getRealNumbers(clock.getAddMinutes(), null)[1];
 		String seconds = main.getGenerator().getRealNumbers(clock.getAddMinutes(), null)[2];
 		main.getGenerator().generatingSequence(clock, hours, minutes, seconds, null);
-		player.sendMessage(ChatColor.DARK_GREEN + DigitalClock.getMessagePrefix() + ChatColor.GREEN + " You have successfully disabled countdown mode on clock '" + args[1] + "'. This clock is now stopped, run it by command 'runclock <name>'.");
+		player.sendMessage(ChatColor.DARK_GREEN + DigitalClock.getMessagePrefix() + ChatColor.GREEN + " You have successfully disabled stopwatch mode on clock '" + args[1] + "'. This clock is now stopped, run it by command 'runclock <name>'.");
 	}
 }

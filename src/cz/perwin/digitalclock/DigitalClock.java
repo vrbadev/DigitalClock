@@ -72,14 +72,17 @@ public class DigitalClock extends JavaPlugin {
 	
 	public void onEnable() {
 		this.console.info("[DigitalClock] Plugin has been enabled!");
-		Version.check(this.getDescription().getVersion());
-		
 		// PREPARING SERVER
 		this.saveDefaultConfig();
 		this.reloadConf();
 		this.saveDefaultClocksConf();
 		this.reloadClocksConf();
 		this.generator = new Generator(this);
+		
+		// CHECK VERSION
+		if(this.getConfig().getBoolean("enableVersionOnStartChecking", true)) {
+			Version.check(this.getDescription().getVersion());
+		}
 		
 		// LOADING CLASSES
 		this.getServer().getPluginManager().registerEvents(new Events(this), this);
@@ -239,7 +242,7 @@ public class DigitalClock extends JavaPlugin {
 		this.clocks = clocks;
 	}
 	
-	public String getMessagePrefix() {
+	public static String getMessagePrefix() {
 		return "[DigitalClock]";
 	}
 	

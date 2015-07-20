@@ -1,20 +1,64 @@
 package cz.perwin.digitalclock.commands;
 
 import org.bukkit.ChatColor;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import cz.perwin.digitalclock.core.CommandInfo;
+import cz.perwin.digitalclock.DigitalClock;
 
-public class CommandReload {
-	public CommandReload(CommandInfo info, CommandSender sender) {
-		if(info.getArgs().length != 1) {
-			sender.sendMessage(ChatColor.DARK_RED + info.getMain().getMessagePrefix() + ChatColor.RED + " Correct usage: '/"+ info.getUsedcmd() + " reload'");
-		} else if(sender instanceof Player && !info.getPlayer().hasPermission("digitalclock.reload") && !info.getPlayer().isOp()) {
-			info.getPlayer().sendMessage(ChatColor.DARK_RED + info.getMain().getMessagePrefix() + ChatColor.RED + " You aren't allowed to use this command!");
-		} else {	
-			info.getMain().reloadConf();
-			sender.sendMessage(ChatColor.DARK_GREEN + info.getMain().getMessagePrefix() + ChatColor.GREEN + " File config.yml has been reloaded!");
+public class CommandReload implements ICommand {
+	@Override
+	public int getArgsSize() {
+		return 1;
+	}
+
+	@Override
+	public String getPermissionName() {
+		return "digitalclock.reload";
+	}
+
+	@Override
+	public boolean specialCondition(DigitalClock main, Player player, String[] args) {
+		return false;
+	}
+
+	@Override
+	public boolean checkClockExistence() {
+		return false;
+	}
+	
+	@Override
+	public boolean neededClockExistenceValue() {
+		return false;
+	}
+
+	@Override
+	public String reactBadArgsSize(String usedCmd) {
+		return ChatColor.DARK_RED + DigitalClock.getMessagePrefix() + ChatColor.RED + " Correct usage: '/"+ usedCmd + " reload'";
+	}
+
+	@Override
+	public String reactNoPermissions() {
+		return ChatColor.DARK_RED + DigitalClock.getMessagePrefix() + ChatColor.RED + " You aren't allowed to use this command!";
+	}
+
+	@Override
+	public void specialConditionProcess(DigitalClock main, Player player, String[] args) {
+		return;
+	}
+
+	@Override
+	public String reactBadClockList(String clockName) {
+		return null;
+	}
+
+	@Override
+	public void process(DigitalClock main, Player player, String[] args) {
+		main.reloadConf();
+		String s = ChatColor.DARK_GREEN + DigitalClock.getMessagePrefix() + ChatColor.GREEN + " File config.yml has been reloaded!";
+		if(player == null) {
+			System.out.println(s);
+		} else {
+			player.sendMessage(s);
 		}
 	}
 }

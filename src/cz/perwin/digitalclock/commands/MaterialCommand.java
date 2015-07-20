@@ -1,7 +1,6 @@
 package cz.perwin.digitalclock.commands;
 
 import org.bukkit.Material;
-import org.bukkit.entity.Player;
 
 public class MaterialCommand {
 	protected boolean isUsableNumber(String s) {
@@ -11,6 +10,7 @@ public class MaterialCommand {
 		return false;
 	}
 
+	/*
 	protected boolean isPermitted(Player player, String[] args) {
 		String command = args[0];
 		String arg = args[2].contains(":") ? args[2].substring(0, args[2].indexOf(':')) : args[2];
@@ -18,7 +18,9 @@ public class MaterialCommand {
 			return true;
 		}
 		return false;
+
 	}
+	*/
 
 	@SuppressWarnings("deprecation")
 	/* Copied from original: https://github.com/Bukkit/Bukkit/blob/master/src/main/java/org/bukkit/Material.java */
@@ -93,7 +95,7 @@ public class MaterialCommand {
 		case GLOWSTONE:
 		case JACK_O_LANTERN:
 		//case CAKE_BLOCK:
-		case LOCKED_CHEST:
+		//case LOCKED_CHEST:
 		case STAINED_GLASS:
 		//case TRAP_DOOR:
 		//case MONSTER_EGGS:

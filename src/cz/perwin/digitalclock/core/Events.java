@@ -37,14 +37,14 @@ public class Events implements Listener {
 					Block playersBlock = player.getWorld().getBlockAt(new Location(player.getWorld(), player.getLocation().getBlockX(), block.getY(), player.getLocation().getBlockZ()));
 					Clock clock = new Clock(this.i.getEnableBuildUsers().get(player), player.getName(), block, playersBlock);
 					clock.writeAndGenerate();
-					player.sendMessage(ChatColor.DARK_GREEN + this.i.getMessagePrefix() + ChatColor.GREEN + " Your clock '" + clock.getName() + "' has been successfully created!" + (this.i.shouldRun() ? " It is running now." : " It isn't running, you can start it by '/dc runclock "+ clock.getName() +"'."));
+					player.sendMessage(ChatColor.DARK_GREEN + DigitalClock.getMessagePrefix() + ChatColor.GREEN + " Your clock '" + clock.getName() + "' has been successfully created!" + (this.i.shouldRun() ? " It is running now." : " It isn't running, you can start it by '/dc runclock "+ clock.getName() +"'."));
 					this.i.getClocks();
 					if(this.i.shouldRun()) {
 						this.i.run(clock.getName());
 					}
 					this.i.getEnableBuildUsers().remove(player);
 				} else {
-					player.sendMessage(ChatColor.DARK_RED + this.i.getMessagePrefix() + ChatColor.RED + " Placed item is not a block (cuboid shape). Please place a block.");
+					player.sendMessage(ChatColor.DARK_RED + DigitalClock.getMessagePrefix() + ChatColor.RED + " Placed item is not a block (cuboid shape). Please place a block.");
 				}
 				evt.setCancelled(true);
 			}
@@ -55,7 +55,7 @@ public class Events implements Listener {
 	public void onPlayerInteract(PlayerInteractEvent evt) {
 		Player player = evt.getPlayer();
 		if(this.i.getEnableBuildUsers().containsKey(player) && evt.getItem() == null) {
-			player.sendMessage(ChatColor.DARK_GREEN + this.i.getMessagePrefix() + ChatColor.GREEN + " Creating of new clock stopped.");
+			player.sendMessage(ChatColor.DARK_GREEN + DigitalClock.getMessagePrefix() + ChatColor.GREEN + " Creating of new clock stopped.");
 			this.i.getEnableBuildUsers().remove(player);
 		}
 		if(evt.getAction() == Action.RIGHT_CLICK_BLOCK && this.i.getEnableMoveUsers().containsKey(player)) {
@@ -63,7 +63,7 @@ public class Events implements Listener {
 			Block playersblock = player.getWorld().getBlockAt(new Location(player.getWorld(), player.getLocation().getBlockX(), block.getY(), player.getLocation().getBlockZ()));
 			Clock clock = Clock.loadClockByClockName(this.i.getEnableMoveUsers().get(player));
 			clock.getClockArea().move(block, playersblock);
-			player.sendMessage(ChatColor.DARK_GREEN + this.i.getMessagePrefix() + ChatColor.GREEN + " Your clock '" + clock.getName() + "' has successfully moved to your position!");
+			player.sendMessage(ChatColor.DARK_GREEN + DigitalClock.getMessagePrefix() + ChatColor.GREEN + " Your clock '" + clock.getName() + "' has successfully moved to your position!");
 			this.i.getEnableMoveUsers().remove(player);
     	}
 	}
@@ -75,11 +75,16 @@ public class Events implements Listener {
 	}
 	
 	@EventHandler
+	public void onStopwatchEnd(StopwatchEndEvent evt) {
+		this.i.getConsole().info("[DigitalClock] Stopwatch of clock '" + evt.getClock().getName() + "' ended at "+ evt.getEndValue() +" seconds! Clock has been stopped.");
+	}
+	
+	@EventHandler
 	public void onPlayerJoin(PlayerJoinEvent evt) {
 		if(this.i.versionWarning()) {
 			if(evt.getPlayer().isOp() || evt.getPlayer().hasPermission("digitalclock.update")) {
-				if(!Version.getActualVersion().equals(this.i.getDescription().getVersion())) {
-					evt.getPlayer().sendMessage(ChatColor.DARK_GREEN + this.i.getMessagePrefix() + ChatColor.GREEN + " There is a newer version (v"+ Version.getActualVersion() +") of this plugin. Download it from "+ ChatColor.UNDERLINE + ChatColor.BLUE +"http://dev.bukkit.org/bukkit-plugins/digitalclock/"+ ChatColor.RESET + ChatColor.GREEN +" or use command '/dc update'.");
+				if(!Version.getActualVersion().getVersion().equals(this.i.getDescription().getVersion())) {
+					evt.getPlayer().sendMessage(ChatColor.DARK_GREEN + DigitalClock.getMessagePrefix() + ChatColor.GREEN + " There is a newer version (v"+ Version.getActualVersion().getVersion() +") of this plugin (v"+ this.i.getDescription().getVersion() +"). Download it from "+ ChatColor.UNDERLINE + ChatColor.BLUE + Version.getActualVersion().getDownloadLink() + "" + ChatColor.RESET + ChatColor.GREEN +" or use command '/dc update'.");
 				}
 			}
 		}
