@@ -4,28 +4,38 @@ import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 import cz.perwin.digitalclock.DigitalClock;
+import cz.perwin.digitalclock.core.Clock;
 
-public class CommandRunclock implements ICommand {
+public class CommandDepth implements ICommand {
 	@Override
 	public int getArgsSize() {
-		return 2;
+		return 3;
 	}
 
 	@Override
 	public String getPermissionName() {
-		return "digitalclock.runclock";
+		return "digitalclock.depth";
 	}
 
 	@Override
 	public boolean specialCondition(DigitalClock main, Player player, String[] args) {
-		return main.getClockTasks().containsKeyByClockName(args[1]);
+		try {
+			int i = Integer.parseInt(args[2]);
+			if(i > 0) {
+				return false;
+			} else {
+				return true;
+			}
+		} catch(Exception e) {
+			return true;
+		}
 	}
 
 	@Override
 	public boolean checkClockExistence() {
 		return true;
 	}
-
+	
 	@Override
 	public boolean neededClockExistenceValue() {
 		return true;
@@ -33,7 +43,7 @@ public class CommandRunclock implements ICommand {
 
 	@Override
 	public String reactBadArgsSize(String usedCmd) {
-		return ChatColor.DARK_RED + DigitalClock.getMessagePrefix() + ChatColor.RED + " Correct usage: '/" + usedCmd + " runclock <name>'";
+		return ChatColor.DARK_RED + DigitalClock.getMessagePrefix() + ChatColor.RED + " Correct usage: '/"+ usedCmd + " depth <name> <depth>'";
 	}
 
 	@Override
@@ -43,7 +53,7 @@ public class CommandRunclock implements ICommand {
 
 	@Override
 	public void specialConditionProcess(DigitalClock main, Player player, String[] args) {
-		player.sendMessage(ChatColor.DARK_RED + DigitalClock.getMessagePrefix() + ChatColor.RED + " Clock '"+ args[1] +"' is already running!");
+		player.sendMessage(ChatColor.DARK_RED + DigitalClock.getMessagePrefix() + ChatColor.RED + " Depth must be positive integer bigger than 0!");
 	}
 
 	@Override
@@ -53,7 +63,9 @@ public class CommandRunclock implements ICommand {
 
 	@Override
 	public void process(DigitalClock main, Player player, String[] args) {
-		main.run(args[1]);
-		player.sendMessage(ChatColor.DARK_GREEN + DigitalClock.getMessagePrefix() + ChatColor.GREEN + " Clock '" + args[1] + "' is now running under task number " + main.getClockTasks().getByClockName(args[1]) + ".");
+		Clock clock = Clock.loadClockByClockName(args[1]);
+		int de = Integer.parseInt(args[2]);
+		clock.getClockArea().setDepth(de);
+		player.sendMessage(ChatColor.DARK_GREEN + DigitalClock.getMessagePrefix() + ChatColor.GREEN + " Your clock '" + args[1] + "' changed depth to " + de + " blocks.");
 	}
 }

@@ -63,9 +63,9 @@ public class CommandSetstopwatch implements ICommand {
 		Clock clock = Clock.loadClockByClockName(args[1]);
 		clock.setStopwatchTime(secs);
 		clock.enableStopwatch(true);
-		if(main.getClockTasks().containsKey(args[1])) {
-			main.getServer().getScheduler().cancelTask(main.getClockTasks().get(args[1]));
-			main.getClockTasks().remove(args[1]);
+		if(main.getClockTasks().containsKeyByClockName(args[1])) {
+			main.getServer().getScheduler().cancelTask(main.getClockTasks().getByClockName(args[1]));
+			main.getClockTasks().removeByClockName(args[1]);
 		}
 		String[] num = main.getGenerator().getNumbersFromSeconds(clock.getStopwatchTime());
 		String hours = num[0];

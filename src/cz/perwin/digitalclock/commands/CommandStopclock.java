@@ -5,7 +5,6 @@ import org.bukkit.entity.Player;
 
 import cz.perwin.digitalclock.DigitalClock;
 import cz.perwin.digitalclock.core.Clock;
-import cz.perwin.digitalclock.core.Generator;
 
 public class CommandStopclock implements ICommand {
 	@Override
@@ -20,7 +19,7 @@ public class CommandStopclock implements ICommand {
 
 	@Override
 	public boolean specialCondition(DigitalClock main, Player player, String[] args) {
-		return !main.getClockTasks().containsKey(args[1]);
+		return !main.getClockTasks().containsKeyByClockName(args[1]);
 	}
 
 	@Override
@@ -56,7 +55,7 @@ public class CommandStopclock implements ICommand {
 	@Override
 	public void process(DigitalClock main, Player player, String[] args) {
 		int task = Clock.stopTask(args[1]);
-		Generator.getGenerator().getMain();
+		//Generator.getGenerator().getMain();
 		player.sendMessage(ChatColor.DARK_GREEN + DigitalClock.getMessagePrefix() + ChatColor.GREEN + " You have successfully stopped clock '" + args[1] + "' (task number " + task + ").");
 	}
 }
