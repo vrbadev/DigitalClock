@@ -26,14 +26,14 @@ public class Clock {
 	private int stopwatchtime;
 	
 	@SuppressWarnings("deprecation")
-	public Clock(String name, String playerName, Block block, Block playersBlock, int depth) {
+	public Clock(String name, String playerName, Block block, Block playersBlock) {
 		this.clockName = name;
 		this.clockCreator = playerName;
 		this.retrieveData = true;
 		this.material = block.getType();
 		this.data = block.getData();
 		this.clockMode = ClockMode.NORMAL;
-		this.clockArea = new ClockArea(this, block, playersBlock, depth);
+		this.clockArea = new ClockArea(this, block, playersBlock);
 	}
 	
 	public void writeAndGenerate() {
@@ -55,7 +55,6 @@ public class Clock {
 			Generator.getGenerator().getMain().getClocksConf().set(this.clockName + ".x2", this.clockArea.getPlayersBlock().getX());
 			Generator.getGenerator().getMain().getClocksConf().set(this.clockName + ".y2", this.clockArea.getPlayersBlock().getY());
 			Generator.getGenerator().getMain().getClocksConf().set(this.clockName + ".z2", this.clockArea.getPlayersBlock().getZ());
-			Generator.getGenerator().getMain().getClocksConf().set(this.clockName + ".depth", this.clockArea.getDepth());
 			Generator.getGenerator().getMain().getClocksConf().set(this.clockName + ".direction", this.clockArea.getDirection().name());
 			Generator.getGenerator().getMain().getClocksConf().set(this.clockName + ".material", this.material.name());
 			Generator.getGenerator().getMain().getClocksConf().set(this.clockName + ".data", this.data);
@@ -95,7 +94,7 @@ public class Clock {
 	}
 	
 	public void enableIngameTime(boolean b) {
-		Generator.removeClockAndRestore(this);
+		ClockThread.getByClock(this).removeThreadAndRestore();
 		this.clockMode = b ? ClockMode.INGAMETIME : ClockMode.NORMAL;
 		this.write();
 	}
@@ -109,17 +108,17 @@ public class Clock {
 	}
 	
 	public static int stopTask(String clockName) {
-		int task = Generator.getGenerator().getMain().getClockTasks().getByClockName(clockName);
+		int task = Generator.getGenerator().getMain().getClockTasks().get(clockName);
 		Generator.getGenerator().getMain().getServer().getScheduler().cancelTask(task);
-		Generator.getGenerator().getMain().getClockTasks().removeByClockName(clockName);
+		Generator.getGenerator().getMain().getClockTasks().remove(clockName);
 		return task;
 	}
 
 	public static void eraseCompletely(Clock clock) {
-		if(Generator.getGenerator().getMain().getClockTasks().containsKeyByClockName(clock.getName())) {
+		if(Generator.getGenerator().getMain().getClockTasks().containsKey(clock.getName())) {
 			Clock.stopTask(clock.getName());
 		}
-		Generator.removeClockAndRestore(clock);
+		ClockThread.getByClock(clock).removeThreadAndRestore();
 		clock.setRetrieveData(false);
 		Generator.getGenerator().getMain().getClocksConf().set(clock.getName(), null);
 		//Generator.getGenerator().getMain().saveConfig();
@@ -129,7 +128,7 @@ public class Clock {
 	    if(Generator.getGenerator().getMain().getClocksConf().getKeys(false).contains(clockName)) {
 			Location loc = new Location(Generator.getGenerator().getMain().getServer().getWorld(Generator.getGenerator().getMain().getClocksConf().getString(clockName + ".world")), Generator.getGenerator().getMain().getClocksConf().getInt(clockName + ".x"), Generator.getGenerator().getMain().getClocksConf().getInt(clockName + ".y"), Generator.getGenerator().getMain().getClocksConf().getInt(clockName + ".z"));
 			Location loc2 = new Location(Generator.getGenerator().getMain().getServer().getWorld(Generator.getGenerator().getMain().getClocksConf().getString(clockName + ".world")), Generator.getGenerator().getMain().getClocksConf().getInt(clockName + ".x2"), Generator.getGenerator().getMain().getClocksConf().getInt(clockName + ".y2"), Generator.getGenerator().getMain().getClocksConf().getInt(clockName + ".z2"));
-	    	return new Clock(clockName, Generator.getGenerator().getMain().getClocksConf().getString(clockName + ".creator"), Generator.getGenerator().getMain().getServer().getWorld(Generator.getGenerator().getMain().getClocksConf().getString(clockName + ".world")).getBlockAt(loc), Generator.getGenerator().getMain().getServer().getWorld(Generator.getGenerator().getMain().getClocksConf().getString(clockName + ".world")).getBlockAt(loc2), Generator.getGenerator().getMain().getClocksConf().getInt(clockName + ".depth"));
+	    	return new Clock(clockName, Generator.getGenerator().getMain().getClocksConf().getString(clockName + ".creator"), Generator.getGenerator().getMain().getServer().getWorld(Generator.getGenerator().getMain().getClocksConf().getString(clockName + ".world")).getBlockAt(loc), Generator.getGenerator().getMain().getServer().getWorld(Generator.getGenerator().getMain().getClocksConf().getString(clockName + ".world")).getBlockAt(loc2));
 	    }
 		return null;
 	}
@@ -137,7 +136,7 @@ public class Clock {
     public void reloadFromConfig() {
     	if(Generator.getGenerator().getMain().getClocksConf().getKeys(false).contains(this.clockName) && this.retrieveData == true) {
         	World w = Generator.getGenerator().getMain().getServer().getWorld(Generator.getGenerator().getMain().getClocksConf().getString(this.clockName + ".world"));
-        	this.clockArea = new ClockArea(this, new Location(w, Generator.getGenerator().getMain().getClocksConf().getInt(this.clockName + ".x"), Generator.getGenerator().getMain().getClocksConf().getInt(this.clockName + ".y"), Generator.getGenerator().getMain().getClocksConf().getInt(this.clockName + ".z")), new Location(w, Generator.getGenerator().getMain().getClocksConf().getInt(this.clockName + ".x2"), Generator.getGenerator().getMain().getClocksConf().getInt(this.clockName + ".y2"), Generator.getGenerator().getMain().getClocksConf().getInt(this.clockName + ".z2")), BlockFace.valueOf(Generator.getGenerator().getMain().getClocksConf().getString(this.clockName + ".direction")), Generator.getGenerator().getMain().getClocksConf().getInt(this.clockName + ".depth"));
+        	this.clockArea = new ClockArea(this, new Location(w, Generator.getGenerator().getMain().getClocksConf().getInt(this.clockName + ".x"), Generator.getGenerator().getMain().getClocksConf().getInt(this.clockName + ".y"), Generator.getGenerator().getMain().getClocksConf().getInt(this.clockName + ".z")), new Location(w, Generator.getGenerator().getMain().getClocksConf().getInt(this.clockName + ".x2"), Generator.getGenerator().getMain().getClocksConf().getInt(this.clockName + ".y2"), Generator.getGenerator().getMain().getClocksConf().getInt(this.clockName + ".z2")), BlockFace.valueOf(Generator.getGenerator().getMain().getClocksConf().getString(this.clockName + ".direction")));
         	this.clockCreator = Generator.getGenerator().getMain().getClocksConf().getString(this.clockName + ".creator");
         	this.material = Material.valueOf(Generator.getGenerator().getMain().getClocksConf().getString(this.clockName + ".material"));
         	this.data = (byte) Generator.getGenerator().getMain().getClocksConf().getInt(this.clockName + ".data");
@@ -207,7 +206,7 @@ public class Clock {
 	}
 	
 	public void setShowingSeconds(boolean ss) {
-		Generator.removeClockAndRestore(this);
+		ClockThread.getByClock(this).removeThreadAndRestore();
 		this.showSeconds = ss;
 		this.write();
 		ClockArea.resetDimensions(this);
@@ -224,7 +223,7 @@ public class Clock {
 	}
 	
 	public void setAMPM(boolean ap) {
-		Generator.removeClockAndRestore(this);
+		ClockThread.getByClock(this).removeThreadAndRestore();
 		this.ampm = ap;
 		this.write();
 		ClockArea.resetDimensions(this);

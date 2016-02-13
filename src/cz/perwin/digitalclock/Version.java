@@ -22,7 +22,6 @@ public class Version {
 		Thread t = new Thread(new Runnable() {
 			@Override
 			public void run() {
-            	Thread.currentThread().setName(Thread.currentThread().getName() + " - DigitalClock version check");
 				if(currentVersion.equals(Version.getActualVersion().getVersion())) {
 					System.out.println("[DigitalClock] Version of this plugin (v"+ currentVersion +") is actual.");
 				} else {

@@ -18,7 +18,7 @@ public class CommandRunclock implements ICommand {
 
 	@Override
 	public boolean specialCondition(DigitalClock main, Player player, String[] args) {
-		return main.getClockTasks().containsKeyByClockName(args[1]);
+		return main.getClockTasks().containsKey(args[1]);
 	}
 
 	@Override
@@ -54,6 +54,6 @@ public class CommandRunclock implements ICommand {
 	@Override
 	public void process(DigitalClock main, Player player, String[] args) {
 		main.run(args[1]);
-		player.sendMessage(ChatColor.DARK_GREEN + DigitalClock.getMessagePrefix() + ChatColor.GREEN + " Clock '" + args[1] + "' is now running under task number " + main.getClockTasks().getByClockName(args[1]) + ".");
+		player.sendMessage(ChatColor.DARK_GREEN + DigitalClock.getMessagePrefix() + ChatColor.GREEN + " Clock '" + args[1] + "' is now running under task number " + main.getClockTasks().get(args[1]) + ".");
 	}
 }

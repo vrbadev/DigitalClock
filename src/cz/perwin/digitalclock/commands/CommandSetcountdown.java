@@ -62,9 +62,9 @@ public class CommandSetcountdown implements ICommand {
 			Clock clock = Clock.loadClockByClockName(args[1]);
 			clock.setCountdownTime(Integer.parseInt(args[2]));
 			clock.enableCountdown(true);
-			if(main.getClockTasks().containsKeyByClockName(args[1])) {
-				main.getServer().getScheduler().cancelTask(main.getClockTasks().getByClockName(args[1]));
-				main.getClockTasks().removeByClockName(args[1]);
+			if(main.getClockTasks().containsKey(args[1])) {
+				main.getServer().getScheduler().cancelTask(main.getClockTasks().get(args[1]));
+				main.getClockTasks().remove(args[1]);
 			}
 			String[] num = main.getGenerator().getNumbersFromSeconds(clock.getCountdownTime());
 			String hours = num[0];

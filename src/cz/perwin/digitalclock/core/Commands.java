@@ -11,7 +11,6 @@ import org.bukkit.entity.Player;
 import cz.perwin.digitalclock.DigitalClock;
 import cz.perwin.digitalclock.commands.CommandAddingminutes;
 import cz.perwin.digitalclock.commands.CommandCreate;
-import cz.perwin.digitalclock.commands.CommandDepth;
 import cz.perwin.digitalclock.commands.CommandDisablecountdown;
 import cz.perwin.digitalclock.commands.CommandDisablestopwatch;
 import cz.perwin.digitalclock.commands.CommandFill;
@@ -19,7 +18,6 @@ import cz.perwin.digitalclock.commands.CommandHelp;
 import cz.perwin.digitalclock.commands.CommandList;
 import cz.perwin.digitalclock.commands.CommandMaterial;
 import cz.perwin.digitalclock.commands.CommandMove;
-import cz.perwin.digitalclock.commands.CommandOff;
 import cz.perwin.digitalclock.commands.CommandReload;
 import cz.perwin.digitalclock.commands.CommandRemove;
 import cz.perwin.digitalclock.commands.CommandRotate;
@@ -38,7 +36,7 @@ import cz.perwin.digitalclock.commands.ICommand;
 
 public class Commands implements CommandExecutor {
 	private DigitalClock i;
-	public static final HashMap<String, Class<?>> commandList = new HashMap<>();
+	public static HashMap<String, Class<?>> commandList = new HashMap<>();
 	
 	static {
 		commandList.put("create", CommandCreate.class);
@@ -60,12 +58,10 @@ public class Commands implements CommandExecutor {
 		commandList.put("disablecountdown", CommandDisablecountdown.class);
 		commandList.put("setstopwatch", CommandSetstopwatch.class);
 		commandList.put("disablestopwatch", CommandDisablestopwatch.class);
-		commandList.put("depth", CommandDepth.class);
 		commandList.put("list", CommandList.class);
 		commandList.put("reload", CommandReload.class);
 		commandList.put("settime", CommandSettime.class);
 		commandList.put("update", CommandUpdate.class);
-		commandList.put("off", CommandOff.class);
 		commandList.put("help", CommandHelp.class);
 		commandList.put("?", CommandHelp.class);
 	}
@@ -98,19 +94,12 @@ public class Commands implements CommandExecutor {
 						player.sendMessage(ChatColor.DARK_RED + DigitalClock.getMessagePrefix() + ChatColor.RED + " This argument doesn't exist. Show '/"+ usedcmd + " help' for more info.");
 					}
         		} else {
-        			switch(args[0].toLowerCase()) {
-        			case "reload":
+        			if(args[0].equalsIgnoreCase("reload")) { // 18
     					this.processCommand(usedcmd, null, args, new CommandReload());
-        				break;
-        			case "update":
+        			} else if(args[0].equalsIgnoreCase("update")) { // 20
     					this.processCommand(usedcmd, null, args, new CommandUpdate());
-        				break;
-        			case "off":
-    					this.processCommand(usedcmd, null, args, new CommandOff());
-        				break;
-        			default:
+        			} else {
         				sender.sendMessage(ChatColor.DARK_RED + DigitalClock.getMessagePrefix() + ChatColor.RED + " This command can be executed only from the game!");
-        				break;
         			}
         		}
 			} else {
@@ -124,7 +113,7 @@ public class Commands implements CommandExecutor {
 	private void processCommand(String usedcmd, Player player, String[] args, ICommand ic) {
 		if(args.length != ic.getArgsSize()) {
 			player.sendMessage(ic.reactBadArgsSize(usedcmd));
-		} else if(player != null && !player.hasPermission(ic.getPermissionName()) && !player.isOp()) {
+		} else if(!player.hasPermission(ic.getPermissionName()) && !player.isOp()) {
 			player.sendMessage(ic.reactNoPermissions());
 		} else if(ic.checkClockExistence() && i.getClocksConf().getKeys(false).contains(args[1]) != ic.neededClockExistenceValue()) {
 			player.sendMessage(ic.reactBadClockList(args[1]));

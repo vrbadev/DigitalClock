@@ -59,9 +59,9 @@ public class CommandDisablestopwatch implements ICommand {
 		Clock clock = Clock.loadClockByClockName(args[1]);
 		clock.enableStopwatch(false);
 		main.getServer().getPluginManager().callEvent(new StopwatchEndEvent(clock, clock.getStopwatchTime()));
-		if(main.getClockTasks().containsKeyByClockName(args[1])) {
-			main.getServer().getScheduler().cancelTask(main.getClockTasks().getByClockName(args[1]));
-			main.getClockTasks().removeByClockName(args[1]);
+		if(main.getClockTasks().containsKey(args[1])) {
+			main.getServer().getScheduler().cancelTask(main.getClockTasks().get(args[1]));
+			main.getClockTasks().remove(args[1]);
 		}
 		String hours = main.getGenerator().getRealNumbers(clock.getAddMinutes(), null)[0];
 		String minutes = main.getGenerator().getRealNumbers(clock.getAddMinutes(), null)[1];

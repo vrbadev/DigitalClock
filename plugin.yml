@@ -1,7 +1,7 @@
 name: DigitalClock
 main: cz.perwin.digitalclock.DigitalClock
 author: PerwinCZ
-version: 2.0
+version: 1.9
 commands:
   digitalclock:
     description: Use more arguments for this command
@@ -33,11 +33,7 @@ permissions:
   digitalclock.reload:
     description: Allows you to reload config.yml file   
   digitalclock.help:
-    description: Allows you to show the plugin command helper     
-  digitalclock.depth:
-    description: Allows you to set depth of your clock
-  digitalclock.off:
-    description: Allows you to disable DigitalClock plugin
+    description: Allows you to show the plugin command helper
   digitalclock.limit.*:
     description: Sets the limit of clocks per player 
   digitalclock.addingminutes:
