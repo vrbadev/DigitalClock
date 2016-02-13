@@ -35,7 +35,7 @@ public class Events implements Listener {
 				Block block = evt.getBlockPlaced();
 				if(new MaterialCommand().isSolid(block.getType())) {
 					Block playersBlock = player.getWorld().getBlockAt(new Location(player.getWorld(), player.getLocation().getBlockX(), block.getY(), player.getLocation().getBlockZ()));
-					Clock clock = new Clock(this.i.getEnableBuildUsers().get(player), player.getName(), block, playersBlock);
+					Clock clock = new Clock(this.i.getEnableBuildUsers().get(player), player.getName(), block, playersBlock, 1);
 					clock.writeAndGenerate();
 					player.sendMessage(ChatColor.DARK_GREEN + DigitalClock.getMessagePrefix() + ChatColor.GREEN + " Your clock '" + clock.getName() + "' has been successfully created!" + (this.i.shouldRun() ? " It is running now." : " It isn't running, you can start it by '/dc runclock "+ clock.getName() +"'."));
 					this.i.getClocks();

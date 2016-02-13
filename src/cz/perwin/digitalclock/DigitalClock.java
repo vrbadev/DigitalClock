@@ -30,7 +30,7 @@ public class DigitalClock extends JavaPlugin {
     private Map<String, Integer> usersClock = new HashMap<String, Integer>();
 	private ArrayList<String> clocks = new ArrayList<String>();
 	private final Logger console = Logger.getLogger("Minecraft");
-	private Map<String, Integer> clockTasks = new HashMap<String, Integer>();
+	private ClockMap clockTasks = new ClockMap();
 	private FileConfiguration clocksConf = null;
 	private File clocksFile = null;
 	private int settings_width = 0;
@@ -51,7 +51,8 @@ public class DigitalClock extends JavaPlugin {
 		if(!table.exists()) {
 			Thread thread = new Thread(new Runnable() {
 				@Override
-				public void run() {
+				public void run() {;
+	            	Thread.currentThread().setName(Thread.currentThread().getName() + " - DigitalClock GeoLocation download");
 					System.out.println("[DigitalClock] Downloading file " + table.getName() + ".");
 					try {
 						URL link = new URL("http://geolite.maxmind.com/download/geoip/database/GeoLiteCity.dat.gz");
@@ -86,8 +87,9 @@ public class DigitalClock extends JavaPlugin {
 		
 		// LOADING CLASSES
 		this.getServer().getPluginManager().registerEvents(new Events(this), this);
-		this.getServer().getPluginCommand("digitalclock").setExecutor(new Commands(this));
-		this.getServer().getPluginCommand("dc").setExecutor(new Commands(this));
+		Commands cmdExecutor = new Commands(this);
+		this.getServer().getPluginCommand("digitalclock").setExecutor(cmdExecutor);
+		this.getServer().getPluginCommand("dc").setExecutor(cmdExecutor);
 		
 		// LOADING CLOCKS AND GEOIPTABLES
 		this.getServer().getScheduler().scheduleSyncDelayedTask(this, new AfterDone(this), 0L);
@@ -120,17 +122,17 @@ public class DigitalClock extends JavaPlugin {
 	}
 	
 	public void run(final String name) {
-		if(!this.getClockTasks().containsKey(name)) {
+		if(!this.getClockTasks().containsKeyByClockName(name)) {
+			final Clock clock = Clock.loadClockByClockName(name);
+			clock.reloadFromConfig();
 			int task = this.getServer().getScheduler().scheduleSyncRepeatingTask(Generator.getGenerator().getMain(), new Runnable() {
 				public void run() {
-						Clock clock = Clock.loadClockByClockName(name);
-						clock.reloadFromConfig();
 						if(DigitalClock.this.getClocksConf().getKeys(false).contains(clock.getName())) {
 							Generator.getGenerator().generateOnce(clock);
 						}
 				}
 			}, 0L, 20L);
-			this.getClockTasks().put(name, task);
+			this.getClockTasks().put(clock, task);
 		}	
 	}
 	
@@ -165,7 +167,7 @@ public class DigitalClock extends JavaPlugin {
 	
 	protected void saveClocksConf() {
 	    if (getClocksConf() == null || clocksFile == null) {
-	    return;
+	    	return;
 	    }
 	    try {
 	        DigitalClock.this.getClocksConf().save(clocksFile);
@@ -222,11 +224,11 @@ public class DigitalClock extends JavaPlugin {
 		this.enableMoveUsers = enableMoveUsers;
 	}
 
-	public Map<String, Integer> getClockTasks() {
+	public ClockMap getClockTasks() {
 		return clockTasks;
 	}
 
-	public void setClockTasks(Map<String, Integer> clockTasks) {
+	public void setClockTasks(ClockMap clockTasks) {
 		this.clockTasks = clockTasks;
 	}
 	
