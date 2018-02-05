@@ -161,3 +161,9 @@ pip-log.txt
 
 # Mac crap
 .DS_Store
+
+# IntelliJ IDEA
+.idea/
+
+# Maven build results
+target/
