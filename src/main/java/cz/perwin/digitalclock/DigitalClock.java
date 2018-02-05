@@ -1,9 +1,6 @@
 package cz.perwin.digitalclock;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
@@ -13,6 +10,7 @@ import java.util.Map;
 import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
 
+import com.google.common.base.Charsets;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -40,7 +38,7 @@ public class DigitalClock extends JavaPlugin {
 	private boolean protectClocks;
 	private long generatorAccuracy = 0;
 	private Generator generator;
-	
+
 	static {
 		System.out.println("[DigitalClock] Preparing DigitalClock for loading...");
 		File pluginDir = new File("plugins/DigitalClock");
@@ -70,7 +68,7 @@ public class DigitalClock extends JavaPlugin {
 			thread.start();
 		}
 	}
-	
+
 	public void onEnable() {
 		this.console.info("[DigitalClock] Plugin has been enabled!");
 		// PREPARING SERVER
@@ -79,21 +77,21 @@ public class DigitalClock extends JavaPlugin {
 		this.saveDefaultClocksConf();
 		this.reloadClocksConf();
 		this.generator = new Generator(this);
-		
+
 		// CHECK VERSION
 		if(this.getConfig().getBoolean("enableVersionOnStartChecking", true)) {
 			Version.check(this.getDescription().getVersion());
 		}
-		
+
 		// LOADING CLASSES
 		this.getServer().getPluginManager().registerEvents(new Events(this), this);
 		Commands cmdExecutor = new Commands(this);
 		this.getServer().getPluginCommand("digitalclock").setExecutor(cmdExecutor);
 		this.getServer().getPluginCommand("dc").setExecutor(cmdExecutor);
-		
+
 		// LOADING CLOCKS AND GEOIPTABLES
 		this.getServer().getScheduler().scheduleSyncDelayedTask(this, new AfterDone(this), 0L);
-		
+
 		// METRICS
 		try {
 		    Metrics metrics = new Metrics(this);
@@ -102,7 +100,7 @@ public class DigitalClock extends JavaPlugin {
 			this.console.severe(e + "");
 		}
 	}
-	
+
 	public void onDisable() {
 		this.getServer().getScheduler().cancelTasks(this);
 		this.console.info("[DigitalClock] Plugin has been disabled!");
@@ -115,12 +113,12 @@ public class DigitalClock extends JavaPlugin {
 				DigitalClock.this.saveClocksConf();
 			}
 		}, 20L, (15*60*20));
-		
+
 		for(final String name : getClocksL()) {
 			this.run(name);
 		}
 	}
-	
+
 	public void run(final String name) {
 		if(!this.getClockTasks().containsKeyByClockName(name)) {
 			final Clock clock = Clock.loadClockByClockName(name);
@@ -133,9 +131,9 @@ public class DigitalClock extends JavaPlugin {
 				}
 			}, 0L, 20L);
 			this.getClockTasks().put(clock, task);
-		}	
+		}
 	}
-	
+
 	public void reloadConf() {
 		this.reloadConfig();
 		DigitalClock.this.settings_width = this.getConfig().getInt("width", 3);
@@ -145,26 +143,25 @@ public class DigitalClock extends JavaPlugin {
 		DigitalClock.this.protectClocks = this.getConfig().getBoolean("protectClocks", false);
 		DigitalClock.this.generatorAccuracy = this.getConfig().getLong("generatorAccuracy", 2000L);
 	}
-	
+
 	public void reloadClocksConf() {
 	    setClocksConf(YamlConfiguration.loadConfiguration(clocksFile));
 	    InputStream defConfigStream = this.getResource("clocks.yml");
 	    if(defConfigStream != null) {
-	        @SuppressWarnings("deprecation")
-			YamlConfiguration defConfig = YamlConfiguration.loadConfiguration(defConfigStream);
+			YamlConfiguration defConfig = YamlConfiguration.loadConfiguration(new InputStreamReader(defConfigStream, Charsets.UTF_8));
 	        getClocksConf().setDefaults(defConfig);
 	    }
 	}
-	
+
 	protected void saveDefaultClocksConf() {
 	    if(clocksFile == null) {
 	    	clocksFile = new File(getDataFolder(), "clocks.yml");
 	    }
-        if(!clocksFile.exists()) {            
+        if(!clocksFile.exists()) {
             this.saveResource("clocks.yml", false);
         }
     }
-	
+
 	protected void saveClocksConf() {
 	    if (getClocksConf() == null || clocksFile == null) {
 	    	return;
@@ -175,7 +172,7 @@ public class DigitalClock extends JavaPlugin {
 	        this.console.severe(ex + "");
 	    }
 	}
-	
+
 	public void getClocks() {
 		this.getClocksL().clear();
 		this.getUsersClock().clear();
@@ -231,7 +228,7 @@ public class DigitalClock extends JavaPlugin {
 	public void setClockTasks(ClockMap clockTasks) {
 		this.clockTasks = clockTasks;
 	}
-	
+
 	public Generator getGenerator() {
 		return this.generator;
 	}
@@ -243,19 +240,19 @@ public class DigitalClock extends JavaPlugin {
 	public void setClocksL(ArrayList<String> clocks) {
 		this.clocks = clocks;
 	}
-	
+
 	public static String getMessagePrefix() {
 		return "[DigitalClock]";
 	}
-	
+
 	public Logger getConsole() {
 		return this.console;
 	}
-	
+
 	public int getSettingsWidth() {
 		return this.settings_width;
 	}
-	
+
 	public boolean shouldRun() {
 		return this.shouldRun;
 	}
@@ -263,15 +260,15 @@ public class DigitalClock extends JavaPlugin {
 	public boolean versionWarning() {
 		return this.versionWarning;
 	}
-	
+
 	public boolean protectClocks() {
 		return this.protectClocks;
 	}
-	
+
 	public boolean shouldGenerateSeparately() {
 		return this.separately;
 	}
-	
+
 	public long getGeneratorAccuracy() {
 		return this.generatorAccuracy;
 	}
